@@ -29,7 +29,17 @@ A custom Home Assistant Lovelace card for displaying solar panels in an interact
 
 ## Installation
 
-### Step 1: Build the Card
+This card can be installed manually or through HACS (Home Assistant Community Store).
+
+### 📦 Install with HACS
+1. Add this repository to HACS as a **Plugin / Dashboard**.
+2. Search for **Solar Panel Grid Card** in the HACS dashboard and install it.
+3. Add the card to your dashboard using the UI editor or YAML (see configuration below).
+
+### 🛠 Manual Installation
+If you prefer not to use HACS, follow these steps:
+
+#### Step 1: Build the Card
 
 ```bash
 cd /path/to/homeassistant-solar-panels
@@ -37,16 +47,20 @@ npm install
 npm run build
 ```
 
-### Step 2: Copy to Home Assistant
+By default the build produces `dist/homeassistant-solar-panels.js`.  A copy named
+`dist/homeassistant-solar-panels.js` is also created so HACS can detect the card
+when the repository name doesn’t match the file name.
 
-Copy the built file to your Home Assistant configuration:
+#### Step 2: Copy to Home Assistant
+
+Copy the built file and image to your Home Assistant configuration:
 
 ```bash
-cp dist/solar-panel-grid-card.js /path/to/homeassistant/config/www/
+cp dist/homeassistant-solar-panels.js /path/to/homeassistant/config/www/
 cp solar-panel-frame.png /path/to/homeassistant/config/www/
 ```
 
-### Step 3: Add Resource Reference
+#### Step 3: Add Resource Reference
 
 Add the following to your Home Assistant Lovelace resources (using UI or YAML):
 
@@ -54,14 +68,14 @@ Add the following to your Home Assistant Lovelace resources (using UI or YAML):
 1. Open Home Assistant
 2. Go to Settings → Dashboards → Resources
 3. Click "Create Resource"
-4. URL: `/local/solar-panel-grid-card.js`
+4. URL: `/local/homeassistant-solar-panels.js`
 5. Resource type: `JavaScript Module`
 
 **YAML Method:**
 Add to your `ui-lovelace.yaml`:
 ```yaml
 resources:
-  - url: /local/solar-panel-grid-card.js
+  - url: /local/homeassistant-solar-panels.js
     type: module
 ```
 
@@ -159,7 +173,7 @@ Panels snap smoothly to the configured grid size while dragging. This provides c
 ### Card Not Showing
 
 1. Check browser console for JavaScript errors (F12)
-2. Verify resource path is correct: `/local/solar-panel-grid-card.js` must exist
+2. Verify resource path is correct: `/local/homeassistant-solar-panels.js` must exist
 3. Clear browser cache and reload Home Assistant
 
 ### Data Not Updating
@@ -193,7 +207,7 @@ src/
   ├── solar-panel-grid-card-editor.ts # Configuration UI
   └── index.ts                        # Entry point
 dist/
-  └── solar-panel-grid-card.js        # Built & bundled output
+  └── homeassistant-solar-panels.js        # Built & bundled output
 solar-panel-frame.png                 # Solar panel image
 ```
 

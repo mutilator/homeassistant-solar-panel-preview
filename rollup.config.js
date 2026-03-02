@@ -5,7 +5,7 @@ import commonjs from '@rollup/plugin-commonjs';
 export default {
   input: 'src/index.ts',
   output: {
-    file: 'dist/solar-panel-grid-card.js',
+    file: 'dist/homeassistant-solar-panels.js',
     format: 'iife',
     sourcemap: true,
     globals: {

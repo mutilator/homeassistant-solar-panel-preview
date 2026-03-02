@@ -4,7 +4,8 @@ package-lock.json
 yarn.lock
 
 # Build output
-dist/
+# keep compiled card in repo so HACS can detect the file
+!dist/*.js
 *.js.map
 *.d.ts
 
