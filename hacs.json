@@ -1,6 +1,6 @@
 {
   "name": "Solar Panel Grid Card",
   "render_readme": true,
-  "filename": "dist/homeassistant-solar-panels.js",
+  "filename": "dist/homeassistant-solar-panel-preview",
   "homeassistant": "2022.8.0"
 }

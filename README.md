@@ -47,8 +47,8 @@ npm install
 npm run build
 ```
 
-By default the build produces `dist/homeassistant-solar-panels.js`.  A copy named
-`dist/homeassistant-solar-panels.js` is also created so HACS can detect the card
+By default the build produces `dist/homeassistant-solar-panel-preview`.  A copy named
+`dist/homeassistant-solar-panel-preview` is also created so HACS can detect the card
 when the repository name doesn’t match the file name.
 
 #### Step 2: Copy to Home Assistant
@@ -56,7 +56,7 @@ when the repository name doesn’t match the file name.
 Copy the built file and image to your Home Assistant configuration:
 
 ```bash
-cp dist/homeassistant-solar-panels.js /path/to/homeassistant/config/www/
+cp dist/homeassistant-solar-panel-preview /path/to/homeassistant/config/www/
 cp solar-panel-frame.png /path/to/homeassistant/config/www/
 ```
 
@@ -68,14 +68,14 @@ Add the following to your Home Assistant Lovelace resources (using UI or YAML):
 1. Open Home Assistant
 2. Go to Settings → Dashboards → Resources
 3. Click "Create Resource"
-4. URL: `/local/homeassistant-solar-panels.js`
+4. URL: `/local/homeassistant-solar-panel-preview`
 5. Resource type: `JavaScript Module`
 
 **YAML Method:**
 Add to your `ui-lovelace.yaml`:
 ```yaml
 resources:
-  - url: /local/homeassistant-solar-panels.js
+  - url: /local/homeassistant-solar-panel-preview
     type: module
 ```
 
@@ -173,7 +173,7 @@ Panels snap smoothly to the configured grid size while dragging. This provides c
 ### Card Not Showing
 
 1. Check browser console for JavaScript errors (F12)
-2. Verify resource path is correct: `/local/homeassistant-solar-panels.js` must exist
+2. Verify resource path is correct: `/local/homeassistant-solar-panel-preview` must exist
 3. Clear browser cache and reload Home Assistant
 
 ### Data Not Updating
@@ -207,7 +207,7 @@ src/
   ├── solar-panel-grid-card-editor.ts # Configuration UI
   └── index.ts                        # Entry point
 dist/
-  └── homeassistant-solar-panels.js        # Built & bundled output
+  └── homeassistant-solar-panel-preview        # Built & bundled output
 solar-panel-frame.png                 # Solar panel image
 ```
 
