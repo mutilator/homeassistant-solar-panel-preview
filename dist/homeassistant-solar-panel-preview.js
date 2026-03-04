@@ -27,6 +27,12 @@
    * SPDX-License-Identifier: BSD-3-Clause
    */var l,o;class s extends u$1{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0;}createRenderRoot(){var t,e;const i=super.createRenderRoot();return null!==(t=(e=this.renderOptions).renderBefore)&&void 0!==t||(e.renderBefore=i.firstChild),i}update(t){const i=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=D(i,this.renderRoot,this.renderOptions);}connectedCallback(){var t;super.connectedCallback(),null===(t=this._$Do)||void 0===t||t.setConnected(!0);}disconnectedCallback(){var t;super.disconnectedCallback(),null===(t=this._$Do)||void 0===t||t.setConnected(!1);}render(){return T}}s.finalized=!0,s._$litElement$=!0,null===(l=globalThis.litElementHydrateSupport)||void 0===l||l.call(globalThis,{LitElement:s});const n=globalThis.litElementPolyfillSupport;null==n||n({LitElement:s});(null!==(o=globalThis.litElementVersions)&&void 0!==o?o:globalThis.litElementVersions=[]).push("3.3.3");
 
+  // default values used throughout the card
+  const DEFAULT_GRID_SIZE = 10;
+  const DEFAULT_PANEL_WIDTH = 80; // px, 1:1.8 aspect ratio
+  const DEFAULT_PANEL_HEIGHT = 144; // px, 1:1.8 aspect ratio
+  const DEFAULT_CONTAINER_WIDTH = 1200; // px workspace
+  const DEFAULT_CONTAINER_HEIGHT = 1200; // px workspace
   // Helper function to convert HSL to RGB
   function hslToRgb(h, s, l) {
       const c = (1 - Math.abs(2 * l - 1)) * s;
@@ -81,12 +87,11 @@
           this.draggedPanel = null;
           this.dragOffset = { x: 0, y: 0 };
           this.panelImage = '/local/solar-panel-frame.png?v=1';
-          this.scrollPosition = { x: 0, y: 0 };
-          this.containerWidth = 1200;
-          this.containerHeight = 1200;
-          this.gridSize = 10;
-          this.panelWidth = 80; // 1:1.8 aspect ratio
-          this.panelHeight = 144; // 1:1.8 aspect ratio
+          this.containerWidth = DEFAULT_CONTAINER_WIDTH;
+          this.containerHeight = DEFAULT_CONTAINER_HEIGHT;
+          this.gridSize = DEFAULT_GRID_SIZE;
+          this.panelWidth = DEFAULT_PANEL_WIDTH;
+          this.panelHeight = DEFAULT_PANEL_HEIGHT;
           this.onMouseMove = (e) => {
               e.preventDefault();
               if (!this.draggedPanel)
@@ -106,22 +111,11 @@
               // Snap to grid
               x = this.snapToGrid(x);
               y = this.snapToGrid(y);
-              const oldX = panel.config.x;
-              const oldY = panel.config.y;
+              panel.config.x;
+              panel.config.y;
               // Update panel position by creating a new config object
               panel.config = { ...panel.config, x, y };
-              if (oldX !== x || oldY !== y) {
-                  console.log('[SolarPanelGridCard] Panel moved:', this.draggedPanel, { x, y });
-              }
               this.requestUpdate();
-              // Restore scroll position after update
-              this.updateComplete.then(() => {
-                  const container = this.shadowRoot?.querySelector('.solar-grid-container');
-                  if (container) {
-                      container.scrollLeft = this.scrollPosition.x;
-                      container.scrollTop = this.scrollPosition.y;
-                  }
-              });
           };
           this.onMouseUp = () => {
               this.draggedPanel = null;
@@ -146,18 +140,13 @@
               window.dispatchEvent(new CustomEvent('solar-panel-positions-changed', {
                   detail: { positions },
               }));
-              console.log('[SolarPanelGridCard] onMouseUp - Dispatching config-changed event', {
-                  updatedConfig,
-                  panelCount: updatedPanels.length,
-              });
               // Dispatch config-changed event for Home Assistant to persist
               const event = new CustomEvent('config-changed', {
                   detail: { config: updatedConfig },
                   bubbles: true,
                   composed: true,
               });
-              const dispatched = this.dispatchEvent(event);
-              console.log('[SolarPanelGridCard] config-changed event dispatched, allowed:', dispatched);
+              this.dispatchEvent(event);
           };
       }
       static get properties() {
@@ -165,6 +154,28 @@
               hass: { type: Object },
               config: { type: Object },
           };
+      }
+      // Determine whether this card is being rendered inside the editor's
+      // preview pane (i.e. the configuration dialog).  The preview wrapper
+      // may provide either a `preview` attribute or the `element-preview`
+      // CSS class on one of the ancestors, which can be inside a shadow root.
+      get isEditorPreview() {
+          let node = this;
+          while (node) {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                  const el = node;
+                  if (el.hasAttribute('preview') || el.classList.contains('element-preview')) {
+                      return true;
+                  }
+              }
+              if (node instanceof ShadowRoot) {
+                  node = node.host;
+              }
+              else {
+                  node = node.parentNode;
+              }
+          }
+          return false;
       }
       // Calculate background color based on production
       getProductionColor(value, max) {
@@ -189,12 +200,13 @@
       static getStubConfig() {
           return {
               type: 'custom:solar-panel-grid-card',
-              grid_size: 10,
-              panel_width: 80,
-              panel_height: 144,
+              grid_size: DEFAULT_GRID_SIZE,
+              panel_width: DEFAULT_PANEL_WIDTH,
+              panel_height: DEFAULT_PANEL_HEIGHT,
               panels: [
                   {
                       entity: 'sensor.solar_panel_1',
+                      name: 'Pnl1',
                       x: 0,
                       y: 0,
                       max_daily_production: 5.5,
@@ -209,9 +221,9 @@
               config.panels = [];
           }
           this.config = config;
-          this.gridSize = config.grid_size || 10;
-          this.panelWidth = config.panel_width || 80;
-          this.panelHeight = config.panel_height || 144;
+          this.gridSize = config.grid_size || DEFAULT_GRID_SIZE;
+          this.panelWidth = config.panel_width || DEFAULT_PANEL_WIDTH;
+          this.panelHeight = config.panel_height || DEFAULT_PANEL_HEIGHT;
           this.panels.clear();
           config.panels.forEach((panelConfig) => {
               this.panels.set(panelConfig.entity, {
@@ -222,8 +234,20 @@
       }
       update(changedProperties) {
           super.update(changedProperties);
+          if (changedProperties.has('config')) {
+              // rebuild panels map whenever config changes
+              this.panels.clear();
+              if (this.config?.panels) {
+                  this.config.panels.forEach((panelConfig) => {
+                      this.panels.set(panelConfig.entity, {
+                          config: panelConfig,
+                          entity: this.hass?.states[panelConfig.entity],
+                      });
+                  });
+              }
+          }
           if (changedProperties.has('hass') && this.hass) {
-              // Update entity data
+              // Update just the entity references when hass updates
               this.panels.forEach((panel, entity) => {
                   panel.entity = this.hass.states[entity];
               });
@@ -249,6 +273,10 @@
           return Math.round(value / this.gridSize) * this.gridSize;
       }
       onPanelMouseDown(e, entityId) {
+          // only allow dragging inside the editor preview
+          if (!this.isEditorPreview) {
+              return;
+          }
           e.preventDefault();
           e.stopPropagation();
           this.draggedPanel = entityId;
@@ -258,24 +286,28 @@
           const container = this.shadowRoot?.querySelector('.solar-grid-container');
           if (!container)
               return;
-          // Save scroll position before dragging
-          this.scrollPosition = {
-              x: container.scrollLeft,
-              y: container.scrollTop,
-          };
           const containerRect = container.getBoundingClientRect();
           // Calculate offset from mouse position to panel's top-left corner
           this.dragOffset = {
               x: e.clientX - (containerRect.left + panel.config.x),
               y: e.clientY - (containerRect.top + panel.config.y),
           };
-          console.log('[SolarPanelGridCard] Starting drag for panel:', entityId, {
-              x: panel.config.x,
-              y: panel.config.y,
-              dragOffset: this.dragOffset,
-          });
           document.addEventListener('mousemove', this.onMouseMove);
           document.addEventListener('mouseup', this.onMouseUp);
+      }
+      onPanelClick(e, entityId) {
+          e.preventDefault();
+          e.stopPropagation();
+          // ignore event if panel is being dragged
+          if (this.draggedPanel === entityId) {
+              return;
+          }
+          const event = new CustomEvent('hass-more-info', {
+              bubbles: true,
+              composed: true,
+              detail: { entityId },
+          });
+          this.dispatchEvent(event);
       }
       /**
        * Get current panel positions
@@ -289,7 +321,6 @@
                   y: panel.config.y,
               };
           });
-          console.log('[SolarPanelGridCard] getCurrentPanelPositions called, returning:', positions);
           return positions;
       }
       connectedCallback() {
@@ -298,17 +329,7 @@
           this.injectCSSOverrides();
           // Use ResizeObserver to actively enforce the width override
           this.enforceFullWidth();
-          // Initialize panels from config
-          if (this.config?.panels) {
-              this.panels.clear();
-              this.config.panels.forEach((panelConfig) => {
-                  this.panels.set(panelConfig.entity, {
-                      config: panelConfig,
-                      entity: this.hass?.states[panelConfig.entity],
-                  });
-              });
-              this.requestUpdate();
-          }
+          // panels map will be populated in update() when config changes
       }
       enforceFullWidth() {
           // Use setInterval to actively enforce width on parent elements
@@ -323,7 +344,7 @@
                           // If the card is narrower than viewport, force it wider
                           if (width < viewportWidth * 0.9) {
                               parent.style.cssText = 'max-width: none !important; width: 100% !important; box-sizing: border-box !important;';
-                              console.log('[SolarPanelGridCard] Enforced hui-card width:', width, '→', viewportWidth);
+                              // width enforcement applied
                               foundHuiCard = true;
                           }
                           break;
@@ -394,7 +415,7 @@
               while (parent) {
                   if (parent.tagName === 'HUI-CARD') {
                       parent.style.cssText = 'max-width: none !important; width: 100% !important;';
-                      console.log('[SolarPanelGridCard] Directly modified hui-card parent styles');
+                      // modified hui-card parent styles
                       break;
                   }
                   parent = parent.parentElement;
@@ -403,13 +424,17 @@
               const contentEl = document.querySelector('.content');
               if (contentEl) {
                   contentEl.style.cssText = 'max-width: none !important; width: 100% !important;';
-                  console.log('[SolarPanelGridCard] Modified .content styles');
+                  // modified .content styles
               }
           }
           catch (e) {
               console.error('[SolarPanelGridCard] Error modifying parent styles:', e);
           }
-          console.log('[SolarPanelGridCard] CSS overrides injected');
+          // CSS overrides injected
+      }
+      getPanelDisplayName(entityId, panelConfig) {
+          // prefer user-specified name, fallback to last 4 chars of the entity id
+          return panelConfig.name ? panelConfig.name : entityId.slice(-4);
       }
       render() {
           return x `
@@ -420,6 +445,7 @@
                 <div
                   class="solar-panel"
                   style="left: ${panel.config.x}px; top: ${panel.config.y}px; width: ${this.panelWidth}px; height: ${this.panelHeight}px;"
+                  @click="${(e) => this.onPanelClick(e, entityId)}"
                   @mousedown="${(e) => this.onPanelMouseDown(e, entityId)}"
                 >
                   <div
@@ -436,7 +462,7 @@
                           `
             : x `<span class="error">N/A</span>`}
                     </div>
-                    <div class="entity-id-suffix">${entityId.slice(-4)}</div>
+                    <div class="entity-id-suffix">${this.getPanelDisplayName(entityId, panel.config)}</div>
                   </div>
                 </div>
               `)}
@@ -464,23 +490,24 @@
       height: 1400px;
       background: transparent;
       border: 1px solid var(--divider-color);
-      cursor: grab;
+      cursor: default;
       user-select: none;
     }
 
-    .solar-grid-container:active {
-      cursor: grabbing;
-    }
+    /* show grab cursor when inside editor preview */
+    
 
     .solar-panel {
       position: absolute;
-      cursor: grab;
+      cursor: pointer;
       transition: box-shadow 0.2s;
       border-radius: 0;
       overflow: hidden;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       pointer-events: auto;
     }
+
+    
 
     .solar-panel:hover {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -565,10 +592,9 @@
           super(...arguments);
           this._expandedPanels = new Set();
           this._onPositionsChanged = (e) => {
-              // Auto-sync when the card dispatches position change event
+              // Auto-sync when the card dispatches position change event (preview)
               const positions = e.detail?.positions;
               if (positions) {
-                  console.log('[SolarPanelGridCardEditor] Detected position update from card, auto-syncing...', positions);
                   this._syncPositionsFromData(positions);
               }
           };
@@ -583,7 +609,7 @@
           this._onGridConfigChanged = (e) => {
               const newConfig = { ...this.config, ...e.detail.value };
               this.config = newConfig;
-              console.log('[SolarPanelGridCardEditor] Grid config changed:', newConfig);
+              // grid config changed
               // Fire config-changed event that Home Assistant listens for
               this.dispatchEvent(new CustomEvent('config-changed', {
                   detail: { config: newConfig },
@@ -594,7 +620,7 @@
           this._onPanelConfigChanged = (e) => {
               const newConfig = { ...this.config, ...e.detail.value };
               this.config = newConfig;
-              console.log('[SolarPanelGridCardEditor] Panel config changed:', newConfig);
+              // panel config changed
               // Fire config-changed event that Home Assistant listens for
               this.dispatchEvent(new CustomEvent('config-changed', {
                   detail: { config: newConfig },
@@ -604,7 +630,6 @@
           };
           this._syncPositionsFromData = (positionsData) => {
               try {
-                  console.log('[SolarPanelGridCardEditor] Syncing positions from data:', positionsData);
                   // Update config with new positions
                   const updatedPanels = this.config.panels?.map((panel) => {
                       const newPos = positionsData[panel.entity];
@@ -622,7 +647,6 @@
                       bubbles: true,
                       composed: true,
                   }));
-                  console.log('[SolarPanelGridCardEditor] Positions synced and saved:', newConfig);
               }
               catch (err) {
                   console.error('[SolarPanelGridCardEditor] Error syncing positions:', err);
@@ -639,7 +663,7 @@
                   bubbles: true,
                   composed: true,
               }));
-              console.log('[SolarPanelGridCardEditor] Panel removed:', newConfig);
+              // panel removed
           };
           this._onPanelEntityChanged = (e) => {
               const panelIndex = parseInt(e.target.getAttribute('data-index') || '0', 10);
@@ -659,12 +683,19 @@
                   bubbles: true,
                   composed: true,
               }));
-              console.log('[SolarPanelGridCardEditor] Panel entity changed at index', panelIndex, 'to', newEntity);
+              // panel entity changed at index
           };
           this._onPanelPropertyChanged = (e) => {
               const panelIndex = parseInt(e.target.getAttribute('data-index') || '0', 10);
               const configValue = e.target.getAttribute('data-config-value');
-              const newValue = e.target.value ? parseFloat(e.target.value) : e.target.value;
+              const raw = e.target.value;
+              let newValue;
+              if (configValue === 'name') {
+                  newValue = raw;
+              }
+              else {
+                  newValue = raw ? parseFloat(raw) : raw;
+              }
               if (!this.config.panels || panelIndex === undefined || !configValue)
                   return;
               const updatedPanels = this.config.panels.map((panel, idx) => {
@@ -680,7 +711,7 @@
                   bubbles: true,
                   composed: true,
               }));
-              console.log('[SolarPanelGridCardEditor] Panel property changed:', configValue, '=', newValue);
+              // panel property changed
           };
           this._togglePanelExpanded = (index) => {
               if (this._expandedPanels.has(index)) {
@@ -709,6 +740,7 @@
           this._addPanel = () => {
               const newPanel = {
                   entity: 'sensor.',
+                  name: '',
                   x: 0,
                   y: 0,
                   max_production: 400,
@@ -722,7 +754,7 @@
                   bubbles: true,
                   composed: true,
               }));
-              console.log('[SolarPanelGridCardEditor] Panel added, total:', updatedPanels.length);
+              // panel added (debug removed)
           };
       }
       static get properties() {
@@ -742,14 +774,12 @@
       }
       connectedCallback() {
           super.connectedCallback();
-          // Listen for position update events from the card
+          // Listen for position update events from the card (preview only)
           window.addEventListener('solar-panel-positions-changed', this._onPositionsChanged);
-          console.log('[SolarPanelGridCardEditor] Listening for position updates from card');
       }
       disconnectedCallback() {
           super.disconnectedCallback();
           window.removeEventListener('solar-panel-positions-changed', this._onPositionsChanged);
-          console.log('[SolarPanelGridCardEditor] Stopped listening for position updates');
       }
       render() {
           if (!this.hass || !this.config) {
@@ -779,11 +809,20 @@
                         <div class="panel-header" @click="${() => this._togglePanelExpanded(idx)}">
                           <div class="panel-header-content">
                             <span class="panel-toggle-icon">${isExpanded ? '▼' : '▶'}</span>
-                            <span class="panel-entity-name">${panel.entity || 'Unnamed Panel'}</span>
+                            <span class="panel-entity-name">${panel.name || panel.entity || 'Unnamed Panel'}</span>
                           </div>
                         </div>
                         ${isExpanded ? x `
                           <div class="panel-content">
+                            <div class="config-row">
+                              <label>Name:</label>
+                              <ha-textfield
+                                .value="${panel.name || ''}"
+                                data-config-value="name"
+                                data-index="${idx}"
+                                @input="${this._onPanelPropertyChanged}"
+                              ></ha-textfield>
+                            </div>
                             <div class="config-row">
                               <label for="entity-${idx}">Entity:</label>
                               <select
@@ -846,7 +885,7 @@
             ${this.config.panels && this.config.panels.length > 0
             ? this.config.panels.map((panel) => x `
                   <div class="panel-item">
-                    <span>${panel.entity}</span>
+                    <span>${panel.name || panel.entity}</span>
                     <span class="position"> @ (${panel.x}, ${panel.y})</span>
                   </div>
                 `)
@@ -1072,4 +1111,4 @@
   return exports;
 
 })({});
-//# sourceMappingURL=homeassistant-solar-panel-preview.map
+//# sourceMappingURL=homeassistant-solar-panel-preview.js.map

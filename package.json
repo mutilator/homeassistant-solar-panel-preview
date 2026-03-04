@@ -1,9 +1,9 @@
 {
   "type": "module",
   "name": "solar-panel-grid-card",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Home Assistant Lovelace card for displaying solar panels in an interactive grid",
-  "main": "dist/homeassistant-solar-panel-preview",
+  "main": "dist/homeassistant-solar-panel-preview.js",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",

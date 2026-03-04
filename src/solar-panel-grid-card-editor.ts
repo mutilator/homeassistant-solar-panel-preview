@@ -4,6 +4,7 @@ interface SolarPanelConfig {
   entity: string;
   x: number;
   y: number;
+  name?: string;
   max_daily_production?: number;
   max_production?: number;
 }
@@ -44,25 +45,23 @@ export class SolarPanelGridCardEditor extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    // Listen for position update events from the card
+    // Listen for position update events from the card (preview only)
     window.addEventListener('solar-panel-positions-changed', this._onPositionsChanged);
-    console.log('[SolarPanelGridCardEditor] Listening for position updates from card');
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener('solar-panel-positions-changed', this._onPositionsChanged);
-    console.log('[SolarPanelGridCardEditor] Stopped listening for position updates');
   }
 
   private _onPositionsChanged = (e: any) => {
-    // Auto-sync when the card dispatches position change event
+    // Auto-sync when the card dispatches position change event (preview)
     const positions = e.detail?.positions;
     if (positions) {
-      console.log('[SolarPanelGridCardEditor] Detected position update from card, auto-syncing...', positions);
       this._syncPositionsFromData(positions);
     }
   }
+
 
   protected render() {
     if (!this.hass || !this.config) {
@@ -93,11 +92,20 @@ export class SolarPanelGridCardEditor extends LitElement {
                         <div class="panel-header" @click="${() => this._togglePanelExpanded(idx)}">
                           <div class="panel-header-content">
                             <span class="panel-toggle-icon">${isExpanded ? '▼' : '▶'}</span>
-                            <span class="panel-entity-name">${panel.entity || 'Unnamed Panel'}</span>
+                            <span class="panel-entity-name">${panel.name || panel.entity || 'Unnamed Panel'}</span>
                           </div>
                         </div>
                         ${isExpanded ? html`
                           <div class="panel-content">
+                            <div class="config-row">
+                              <label>Name:</label>
+                              <ha-textfield
+                                .value="${panel.name || ''}"
+                                data-config-value="name"
+                                data-index="${idx}"
+                                @input="${this._onPanelPropertyChanged}"
+                              ></ha-textfield>
+                            </div>
                             <div class="config-row">
                               <label for="entity-${idx}">Entity:</label>
                               <select
@@ -162,7 +170,7 @@ export class SolarPanelGridCardEditor extends LitElement {
             ${this.config.panels && this.config.panels.length > 0
               ? this.config.panels.map((panel: any) => html`
                   <div class="panel-item">
-                    <span>${panel.entity}</span>
+                    <span>${panel.name || panel.entity}</span>
                     <span class="position"> @ (${panel.x}, ${panel.y})</span>
                   </div>
                 `)
@@ -232,7 +240,7 @@ export class SolarPanelGridCardEditor extends LitElement {
     const newConfig = { ...this.config, ...e.detail.value };
     this.config = newConfig;
     
-    console.log('[SolarPanelGridCardEditor] Grid config changed:', newConfig);
+    // grid config changed
 
     // Fire config-changed event that Home Assistant listens for
     this.dispatchEvent(
@@ -248,7 +256,7 @@ export class SolarPanelGridCardEditor extends LitElement {
     const newConfig = { ...this.config, ...e.detail.value };
     this.config = newConfig;
     
-    console.log('[SolarPanelGridCardEditor] Panel config changed:', newConfig);
+    // panel config changed
 
     // Fire config-changed event that Home Assistant listens for
     this.dispatchEvent(
@@ -262,8 +270,6 @@ export class SolarPanelGridCardEditor extends LitElement {
 
   private _syncPositionsFromData = (positionsData: Record<string, { x: number; y: number }>) => {
     try {
-      console.log('[SolarPanelGridCardEditor] Syncing positions from data:', positionsData);
-
       // Update config with new positions
       const updatedPanels = this.config.panels?.map((panel: any) => {
         const newPos = positionsData[panel.entity];
@@ -285,12 +291,11 @@ export class SolarPanelGridCardEditor extends LitElement {
           composed: true,
         })
       );
-
-      console.log('[SolarPanelGridCardEditor] Positions synced and saved:', newConfig);
     } catch (err) {
       console.error('[SolarPanelGridCardEditor] Error syncing positions:', err);
     }
   }
+
 
   private _removePanel = (index: number) => {
     if (!this.config.panels) return;
@@ -307,7 +312,7 @@ export class SolarPanelGridCardEditor extends LitElement {
       })
     );
 
-    console.log('[SolarPanelGridCardEditor] Panel removed:', newConfig);
+    // panel removed
   }
 
   private _onPanelEntityChanged = (e: any) => {
@@ -334,13 +339,19 @@ export class SolarPanelGridCardEditor extends LitElement {
       })
     );
 
-    console.log('[SolarPanelGridCardEditor] Panel entity changed at index', panelIndex, 'to', newEntity);
+    // panel entity changed at index
   }
 
   private _onPanelPropertyChanged = (e: any) => {
     const panelIndex = parseInt((e.target as HTMLElement).getAttribute('data-index') || '0', 10);
     const configValue = (e.target as HTMLElement).getAttribute('data-config-value');
-    const newValue = e.target.value ? parseFloat(e.target.value) : e.target.value;
+    const raw = (e.target as any).value;
+    let newValue: any;
+    if (configValue === 'name') {
+      newValue = raw;
+    } else {
+      newValue = raw ? parseFloat(raw) : raw;
+    }
 
     if (!this.config.panels || panelIndex === undefined || !configValue) return;
 
@@ -362,7 +373,7 @@ export class SolarPanelGridCardEditor extends LitElement {
       })
     );
 
-    console.log('[SolarPanelGridCardEditor] Panel property changed:', configValue, '=', newValue);
+    // panel property changed
   }
 
   private _togglePanelExpanded = (index: number) => {
@@ -393,6 +404,7 @@ export class SolarPanelGridCardEditor extends LitElement {
   private _addPanel = () => {
     const newPanel = {
       entity: 'sensor.',
+      name: '',
       x: 0,
       y: 0,
       max_production: 400,
@@ -411,7 +423,7 @@ export class SolarPanelGridCardEditor extends LitElement {
       })
     );
 
-    console.log('[SolarPanelGridCardEditor] Panel added, total:', updatedPanels.length);
+    // panel added (debug removed)
   }
 
   static get styles() {

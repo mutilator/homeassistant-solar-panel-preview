@@ -5,7 +5,7 @@ A custom Home Assistant Lovelace card for displaying solar panels in an interact
 ## Features
 
 - **Grid Layout**: Display multiple solar panels in a flexible grid (1400×1400px workspace)
-- **Drag & Drop**: Move panels freely around the canvas with smooth snapping
+- **Drag & Drop**: Move panels freely around the canvas with smooth snapping (available when the dashboard is in edit mode or in the card editor preview)
 - **Snap-to-Grid**: Panels snap to a configurable grid for neat alignment
 - **Live Data**: Real-time display of current production values from sensor entities
 - **Entity Identification**: Last 4 characters of entity ID displayed at bottom-right of each panel for quick identification
@@ -14,7 +14,7 @@ A custom Home Assistant Lovelace card for displaying solar panels in an interact
   - Automatically scales based on unit type (kWh for daily energy, W for instantaneous power)
 - **Full-Width Canvas**: Automatically expands card to viewport width for maximum workspace
 - **Collapsible Panel UI**: Configuration panel headers collapse/expand to manage 30+ panels efficiently
-- **Configuration UI**: Drag-and-drop editor with schema-driven grid settings and panel-level configurations
+- **Configuration UI**: Drag-and-drop editor preview with schema-driven grid settings and panel-level configurations
 
 ## Preview
 
@@ -23,7 +23,7 @@ A custom Home Assistant Lovelace card for displaying solar panels in an interact
 
 ### Configuration Editor
 
-> NOTE: It's recommended to click the titlebar of the configuration dialog so you can drag/drop panels easier.
+> NOTE: While dragging only works when the dashboard is in edit mode (e.g. when the configuration dialog is open), clicking the titlebar of the dialog can still make the preview area easier to manipulate.
 
 <img src="config-preview.png" alt="Configuration Editor Preview" width="100%">
 
@@ -164,7 +164,7 @@ Percentage = Current Value / Max Value (based on unit_of_measurement)
 - If sensor has `unit_of_measurement: "W"` → Uses `max_production` for color scaling
 - Otherwise → Defaults to `max_production`
 
-### Snap Behavior
+### Positioning
 
 Panels snap smoothly to the configured grid size while dragging. This provides clean, aligned layouts without the complexity of panel-to-panel snapping.
 

@@ -4,6 +4,7 @@ interface SolarPanelConfig {
   entity: string;
   x: number;
   y: number;
+  name?: string;              // optional display name (defaults to last 4 chars of entity_id)
   max_daily_production?: number; // kWh
   max_production?: number; // W
 }
@@ -15,6 +16,13 @@ interface SolarPanelGridCardConfig {
   panel_width?: number;
   panel_height?: number;
 }
+
+// default values used throughout the card
+const DEFAULT_GRID_SIZE = 10;
+const DEFAULT_PANEL_WIDTH = 80;          // px, 1:1.8 aspect ratio
+const DEFAULT_PANEL_HEIGHT = 144;        // px, 1:1.8 aspect ratio
+const DEFAULT_CONTAINER_WIDTH = 1200;    // px workspace
+const DEFAULT_CONTAINER_HEIGHT = 1200;   // px workspace
 
 interface HassEntity {
   entity_id: string;
@@ -97,13 +105,34 @@ export class SolarPanelGridCard extends LitElement {
   private draggedPanel: string | null = null;
   private dragOffset = { x: 0, y: 0 };
   private panelImage: string = '/local/solar-panel-frame.png?v=1';
-  private scrollPosition = { x: 0, y: 0 };
+  private containerWidth = DEFAULT_CONTAINER_WIDTH;
+  private containerHeight = DEFAULT_CONTAINER_HEIGHT;
+  private gridSize = DEFAULT_GRID_SIZE;
+  private panelWidth = DEFAULT_PANEL_WIDTH;
+  private panelHeight = DEFAULT_PANEL_HEIGHT;
 
-  private containerWidth = 1200;
-  private containerHeight = 1200;
-  private gridSize = 10;
-  private panelWidth = 80;  // 1:1.8 aspect ratio
-  private panelHeight = 144; // 1:1.8 aspect ratio
+  // Determine whether this card is being rendered inside the editor's
+  // preview pane (i.e. the configuration dialog).  The preview wrapper
+  // may provide either a `preview` attribute or the `element-preview`
+  // CSS class on one of the ancestors, which can be inside a shadow root.
+  private get isEditorPreview(): boolean {
+    let node: any = this;
+    while (node) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as HTMLElement;
+        if (el.hasAttribute('preview') || el.classList.contains('element-preview')) {
+          return true;
+        }
+      }
+      if (node instanceof ShadowRoot) {
+        node = node.host;
+      } else {
+        node = node.parentNode;
+      }
+    }
+    return false;
+  }
+
 
   // Calculate background color based on production
   private getProductionColor(value: number, max: number): string {
@@ -133,12 +162,13 @@ export class SolarPanelGridCard extends LitElement {
   static getStubConfig() {
     return {
       type: 'custom:solar-panel-grid-card',
-      grid_size: 10,
-      panel_width: 80,
-      panel_height: 144,
+      grid_size: DEFAULT_GRID_SIZE,
+      panel_width: DEFAULT_PANEL_WIDTH,
+      panel_height: DEFAULT_PANEL_HEIGHT,
       panels: [
         {
           entity: 'sensor.solar_panel_1',
+          name: 'Pnl1',
           x: 0,
           y: 0,
           max_daily_production: 5.5,
@@ -155,9 +185,9 @@ export class SolarPanelGridCard extends LitElement {
     }
 
     this.config = config;
-    this.gridSize = config.grid_size || 10;
-    this.panelWidth = config.panel_width || 80;
-    this.panelHeight = config.panel_height || 144;
+    this.gridSize = config.grid_size || DEFAULT_GRID_SIZE;
+    this.panelWidth = config.panel_width || DEFAULT_PANEL_WIDTH;
+    this.panelHeight = config.panel_height || DEFAULT_PANEL_HEIGHT;
 
     this.panels.clear();
     config.panels.forEach((panelConfig) => {
@@ -171,8 +201,21 @@ export class SolarPanelGridCard extends LitElement {
   update(changedProperties: Map<string | number | symbol, unknown>) {
     super.update(changedProperties);
 
+    if (changedProperties.has('config')) {
+      // rebuild panels map whenever config changes
+      this.panels.clear();
+      if (this.config?.panels) {
+        this.config.panels.forEach((panelConfig) => {
+          this.panels.set(panelConfig.entity, {
+            config: panelConfig,
+            entity: this.hass?.states[panelConfig.entity],
+          });
+        });
+      }
+    }
+
     if (changedProperties.has('hass') && this.hass) {
-      // Update entity data
+      // Update just the entity references when hass updates
       this.panels.forEach((panel, entity) => {
         panel.entity = this.hass.states[entity];
       });
@@ -200,7 +243,14 @@ export class SolarPanelGridCard extends LitElement {
     return Math.round(value / this.gridSize) * this.gridSize;
   }
 
+
+
   private onPanelMouseDown(e: MouseEvent, entityId: string) {
+    // only allow dragging inside the editor preview
+    if (!this.isEditorPreview) {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
     this.draggedPanel = entityId;
@@ -211,11 +261,6 @@ export class SolarPanelGridCard extends LitElement {
     const container = this.shadowRoot?.querySelector('.solar-grid-container') as HTMLElement;
     if (!container) return;
 
-    // Save scroll position before dragging
-    this.scrollPosition = {
-      x: container.scrollLeft,
-      y: container.scrollTop,
-    };
 
     const containerRect = container.getBoundingClientRect();
 
@@ -225,14 +270,25 @@ export class SolarPanelGridCard extends LitElement {
       y: e.clientY - (containerRect.top + panel.config.y),
     };
 
-    console.log('[SolarPanelGridCard] Starting drag for panel:', entityId, {
-      x: panel.config.x,
-      y: panel.config.y,
-      dragOffset: this.dragOffset,
-    });
-
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
+  }
+
+  private onPanelClick(e: MouseEvent, entityId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // ignore event if panel is being dragged
+    if (this.draggedPanel === entityId) {
+      return;
+    }
+
+    const event = new CustomEvent('hass-more-info', {
+      bubbles: true,
+      composed: true,
+      detail: { entityId },
+    });
+    this.dispatchEvent(event);
   }
 
   private onMouseMove = (e: MouseEvent) => {
@@ -263,20 +319,8 @@ export class SolarPanelGridCard extends LitElement {
     // Update panel position by creating a new config object
     panel.config = { ...panel.config, x, y };
 
-    if (oldX !== x || oldY !== y) {
-      console.log('[SolarPanelGridCard] Panel moved:', this.draggedPanel, { x, y });
-    }
-
     this.requestUpdate();
 
-    // Restore scroll position after update
-    this.updateComplete.then(() => {
-      const container = this.shadowRoot?.querySelector('.solar-grid-container') as HTMLElement;
-      if (container) {
-        container.scrollLeft = this.scrollPosition.x;
-        container.scrollTop = this.scrollPosition.y;
-      }
-    });
   };
 
   private onMouseUp = () => {
@@ -309,20 +353,15 @@ export class SolarPanelGridCard extends LitElement {
       })
     );
 
-    console.log('[SolarPanelGridCard] onMouseUp - Dispatching config-changed event', {
-      updatedConfig,
-      panelCount: updatedPanels.length,
-    });
-
     // Dispatch config-changed event for Home Assistant to persist
     const event = new CustomEvent('config-changed', {
       detail: { config: updatedConfig },
       bubbles: true,
       composed: true,
     });
-    const dispatched = this.dispatchEvent(event);
-    console.log('[SolarPanelGridCard] config-changed event dispatched, allowed:', dispatched);
+    this.dispatchEvent(event);
   };
+
 
   /**
    * Get current panel positions
@@ -336,7 +375,6 @@ export class SolarPanelGridCard extends LitElement {
         y: panel.config.y,
       };
     });
-    console.log('[SolarPanelGridCard] getCurrentPanelPositions called, returning:', positions);
     return positions;
   }
 
@@ -346,17 +384,7 @@ export class SolarPanelGridCard extends LitElement {
     this.injectCSSOverrides();
     // Use ResizeObserver to actively enforce the width override
     this.enforceFullWidth();
-    // Initialize panels from config
-    if (this.config?.panels) {
-      this.panels.clear();
-      this.config.panels.forEach((panelConfig) => {
-        this.panels.set(panelConfig.entity, {
-          config: panelConfig,
-          entity: this.hass?.states[panelConfig.entity],
-        });
-      });
-      this.requestUpdate();
-    }
+    // panels map will be populated in update() when config changes
   }
 
   private enforceFullWidth() {
@@ -374,7 +402,7 @@ export class SolarPanelGridCard extends LitElement {
             // If the card is narrower than viewport, force it wider
             if (width < viewportWidth * 0.9) {
               parent.style.cssText = 'max-width: none !important; width: 100% !important; box-sizing: border-box !important;';
-              console.log('[SolarPanelGridCard] Enforced hui-card width:', width, '→', viewportWidth);
+              // width enforcement applied
               foundHuiCard = true;
             }
             break;
@@ -449,7 +477,7 @@ export class SolarPanelGridCard extends LitElement {
       while (parent) {
         if (parent.tagName === 'HUI-CARD') {
           parent.style.cssText = 'max-width: none !important; width: 100% !important;';
-          console.log('[SolarPanelGridCard] Directly modified hui-card parent styles');
+          // modified hui-card parent styles
           break;
         }
         parent = parent.parentElement;
@@ -458,14 +486,20 @@ export class SolarPanelGridCard extends LitElement {
       // Also try to modify .content if found
       const contentEl = document.querySelector('.content');
       if (contentEl) {
-        contentEl.style.cssText = 'max-width: none !important; width: 100% !important;';
-        console.log('[SolarPanelGridCard] Modified .content styles');
+        // TypeScript doesn’t know this is an HTMLElement
+        (contentEl as HTMLElement).style.cssText = 'max-width: none !important; width: 100% !important;';
+        // modified .content styles
       }
     } catch (e) {
       console.error('[SolarPanelGridCard] Error modifying parent styles:', e);
     }
     
-    console.log('[SolarPanelGridCard] CSS overrides injected');
+    // CSS overrides injected
+  }
+
+  private getPanelDisplayName(entityId: string, panelConfig: SolarPanelConfig): string {
+    // prefer user-specified name, fallback to last 4 chars of the entity id
+    return panelConfig.name ? panelConfig.name : entityId.slice(-4);
   }
 
   render() {
@@ -478,6 +512,7 @@ export class SolarPanelGridCard extends LitElement {
                 <div
                   class="solar-panel"
                   style="left: ${panel.config.x}px; top: ${panel.config.y}px; width: ${this.panelWidth}px; height: ${this.panelHeight}px;"
+                  @click="${(e: MouseEvent) => this.onPanelClick(e, entityId)}"
                   @mousedown="${(e: MouseEvent) => this.onPanelMouseDown(e, entityId)}"
                 >
                   <div
@@ -500,7 +535,7 @@ export class SolarPanelGridCard extends LitElement {
                           `
                         : html`<span class="error">N/A</span>`}
                     </div>
-                    <div class="entity-id-suffix">${entityId.slice(-4)}</div>
+                    <div class="entity-id-suffix">${this.getPanelDisplayName(entityId, panel.config)}</div>
                   </div>
                 </div>
               `
@@ -529,23 +564,24 @@ export class SolarPanelGridCard extends LitElement {
       height: 1400px;
       background: transparent;
       border: 1px solid var(--divider-color);
-      cursor: grab;
+      cursor: default;
       user-select: none;
     }
 
-    .solar-grid-container:active {
-      cursor: grabbing;
-    }
+    /* show grab cursor when inside editor preview */
+    
 
     .solar-panel {
       position: absolute;
-      cursor: grab;
+      cursor: pointer;
       transition: box-shadow 0.2s;
       border-radius: 0;
       overflow: hidden;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       pointer-events: auto;
     }
+
+    
 
     .solar-panel:hover {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
