@@ -8,7 +8,7 @@ A custom Home Assistant Lovelace card for displaying solar panels in an interact
 - **Drag & Drop**: Move panels freely around the canvas with smooth snapping (available when the dashboard is in edit mode or in the card editor preview)
 - **Snap-to-Grid**: Panels snap to a configurable grid for neat alignment
 - **Live Data**: Real-time display of current production values from sensor entities
-- **Entity Identification**: Last 4 characters of entity ID displayed at bottom-right of each panel for quick identification
+- **Panel Naming**: Optional `name` property on each panel used for the label; falls back to the last 4 characters of the entity ID if unspecified
 - **Color Visualization**: Background color gradient indicates production level
   - Black (0%) → Dark Blue (Hue 240°) → Light Blue (Hue 180°) at 100%
   - Automatically scales based on unit type (kWh for daily energy, W for instantaneous power)
@@ -100,11 +100,13 @@ panel_width: 80            # Panel width in pixels (default: 80)
 panel_height: 144          # Panel height in pixels (default: 144, 1:1.8 aspect ratio)
 panels:
   - entity: sensor.solar_inverter_1
+    name: "A1"            # optional display name (defaults to last 4 of entity if omitted)
     x: 0
     y: 0
     max_daily_production: 5.5  # Maximum daily production in kWh
     max_production: 400        # Maximum instantaneous power in W
   - entity: sensor.solar_inverter_2
+    # no name specified, will fall back to entity suffix
     x: 85
     y: 0
     max_daily_production: 5.5
@@ -130,6 +132,7 @@ panels:
 | `entity` | string | Required | Power or energy sensor entity ID (e.g., `sensor.solar_inverter_1`). Filtered selector only shows entities with `device_class: power` or `device_class: energy` |
 | `x` | number | 0 | Horizontal position in pixels |
 | `y` | number | 0 | Vertical position in pixels |
+| `name` | string | (last 4 of entity) | Optional panel display name; defaults to the last four characters of the entity ID |
 | `max_daily_production` | number | 5.5 | Maximum daily production in kWh (used for `kWh` and `Wh` units) |
 | `max_production` | number | 400 | Maximum instantaneous power in W (used for `W` units) |
 
