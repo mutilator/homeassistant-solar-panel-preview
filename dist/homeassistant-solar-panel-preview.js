@@ -68,29 +68,29 @@
         return x(compiled.strings, ...orderedValues);
     }
 
-    var cardStyles = "ha-card {\n  height: 100%;\n  width: 100%;\n  position: relative;\n}\n\n.card-content {\n  padding: 16px;\n  overflow: auto;\n  position: relative;\n}\n\n.top-controls {\n  position: sticky;\n  top: 0;\n  z-index: 10;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 10px;\n  flex-wrap: wrap;\n  background: var(--card-background-color, var(--ha-card-background, #fff));\n  padding-bottom: 8px;\n  margin-bottom: 6px;\n}\n\n.history-controls {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  flex-wrap: wrap;\n  min-width: 240px;\n  flex: 1;\n}\n\n.history-label {\n  font-size: 12px;\n  color: var(--secondary-text-color, #666);\n  font-weight: 500;\n}\n\n.history-date-input {\n  min-width: 130px;\n  padding: 4px 8px;\n  border-radius: 8px;\n  border: 1px solid var(--divider-color, #d0d0d0);\n  background: var(--card-background-color, var(--ha-card-background, #fff));\n  color: var(--primary-text-color, #222);\n  font-size: 12px;\n}\n\n.history-day-btn {\n  width: 28px;\n  height: 28px;\n  border: 1px solid var(--divider-color, #d0d0d0);\n  border-radius: 50%;\n  background: var(--card-background-color, var(--ha-card-background, #fff));\n  color: var(--primary-text-color, #222);\n  font-size: 18px;\n  line-height: 1;\n  padding: 0;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  flex: 0 0 auto;\n}\n\n.history-day-btn:hover {\n  border-color: var(--primary-color, #03a9f4);\n  color: var(--primary-color, #03a9f4);\n}\n\n.history-time-slider {\n  width: min(280px, 48vw);\n  min-width: 140px;\n  accent-color: var(--primary-color, #03a9f4);\n  cursor: pointer;\n}\n\n.history-time-value {\n  min-width: 42px;\n  font-size: 12px;\n  font-weight: 600;\n  color: var(--primary-text-color, #333);\n  text-align: right;\n}\n\n.history-now-btn {\n  border: 1px solid var(--divider-color, #d0d0d0);\n  border-radius: 12px;\n  background: var(--card-background-color, var(--ha-card-background, #fff));\n  color: var(--primary-text-color, #222);\n  font-size: 11px;\n  font-weight: 600;\n  line-height: 1;\n  padding: 6px 10px;\n  cursor: pointer;\n}\n\n.history-now-btn:hover {\n  border-color: var(--primary-color, #03a9f4);\n  color: var(--primary-color, #03a9f4);\n}\n\n.history-meta {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  font-size: 12px;\n  margin-bottom: 8px;\n  color: var(--secondary-text-color, #666);\n}\n\n.history-status {\n  font-weight: 600;\n  color: var(--primary-color, #03a9f4);\n}\n\n.history-error {\n  margin-bottom: 8px;\n  font-size: 12px;\n  color: #d32f2f;\n}\n\n.canvas-wrapper {\n  position: relative;\n  margin: 0 auto;\n  overflow: hidden;\n}\n\n.canvas-wrapper.interactive {\n  touch-action: none;\n  cursor: grab;\n}\n\n.canvas-wrapper.interactive:active {\n  cursor: grabbing;\n}\n\n.solar-grid-container {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  background: transparent;\n  border: 1px solid var(--divider-color);\n  cursor: default;\n  user-select: none;\n  transform-origin: center center;\n}\n\n.background-image {\n  position: absolute;\n  top: 0;\n  left: 0;\n  object-fit: none;\n  object-position: top left;\n  z-index: 0;\n  pointer-events: none;\n}\n\n.view-toggle {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  background: var(--card-background-color, var(--ha-card-background, #fff));\n  border: 1px solid var(--divider-color, #e0e0e0);\n  border-radius: 20px;\n  padding: 4px 10px;\n  cursor: pointer;\n  user-select: none;\n  white-space: nowrap;\n}\n\n.view-toggle:hover {\n  border-color: var(--primary-color, #03a9f4);\n}\n\n.toggle-label {\n  font-size: 11px;\n  font-weight: 400;\n  color: var(--secondary-text-color, #888);\n  transition: color 0.2s, font-weight 0.2s;\n}\n\n.toggle-label.active {\n  font-weight: 700;\n  color: var(--primary-text-color, #333);\n}\n\n.toggle-track {\n  position: relative;\n  width: 32px;\n  height: 16px;\n  border-radius: 8px;\n  background: var(--disabled-color, #bdbdbd);\n  transition: background 0.25s;\n}\n\n.toggle-track.on {\n  background: var(--primary-color, #03a9f4);\n}\n\n.toggle-thumb {\n  position: absolute;\n  top: 2px;\n  left: 2px;\n  width: 12px;\n  height: 12px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);\n  transition: left 0.25s;\n}\n\n.toggle-track.on .toggle-thumb {\n  left: 18px;\n}\n\n.solar-panel {\n  position: absolute;\n  cursor: pointer;\n  transition: box-shadow 0.2s;\n  border-radius: 0;\n  overflow: hidden;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n  pointer-events: auto;\n  transform-origin: center center;\n}\n\n.solar-panel:hover {\n  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);\n}\n\n.panel-background {\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  top: 0;\n  left: 0;\n  z-index: 0;\n  transition: background-color 0.3s ease;\n}\n\n.panel-image {\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  object-fit: contain;\n  object-position: center;\n  z-index: 1;\n  opacity: 0.9;\n}\n\n.panel-overlay {\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  z-index: 2;\n}\n\n.panel-value {\n  background: rgba(0, 0, 0, 0.6);\n  color: white;\n  padding: 6px 12px;\n  border-radius: 4px;\n  font-size: 12px;\n  font-weight: bold;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 2px;\n}\n\n.value {\n  font-size: 14px;\n}\n\n.unit {\n  font-size: 10px;\n  opacity: 0.8;\n}\n\n.entity-id-suffix {\n  position: absolute;\n  bottom: 4px;\n  right: 4px;\n  background: rgba(0, 0, 0, 0.7);\n  color: white;\n  font-size: 9px;\n  padding: 2px 6px;\n  border-radius: 3px;\n}\n\n.error {\n  color: #ff6b6b;\n}\n";
+    var cardStyles = "ha-card {\r\n  height: 100%;\r\n  width: 100%;\r\n  position: relative;\r\n}\r\n\r\n.card-content {\r\n  padding: 16px;\r\n  overflow: auto;\r\n  position: relative;\r\n}\r\n\r\n.top-controls {\r\n  position: sticky;\r\n  top: 0;\r\n  z-index: 10;\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n  gap: 10px;\r\n  flex-wrap: wrap;\r\n  background: var(--card-background-color, var(--ha-card-background, #fff));\r\n  padding-bottom: 8px;\r\n  margin-bottom: 6px;\r\n}\r\n\r\n.history-controls {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  flex-wrap: wrap;\r\n  min-width: 240px;\r\n  flex: 1;\r\n}\r\n\r\n.history-label {\r\n  font-size: 12px;\r\n  color: var(--secondary-text-color, #666);\r\n  font-weight: 500;\r\n}\r\n\r\n.history-date-input {\r\n  min-width: 130px;\r\n  padding: 4px 8px;\r\n  border-radius: 8px;\r\n  border: 1px solid var(--divider-color, #d0d0d0);\r\n  background: var(--card-background-color, var(--ha-card-background, #fff));\r\n  color: var(--primary-text-color, #222);\r\n  font-size: 12px;\r\n}\r\n\r\n.history-day-btn {\r\n  width: 28px;\r\n  height: 28px;\r\n  border: 1px solid var(--divider-color, #d0d0d0);\r\n  border-radius: 50%;\r\n  background: var(--card-background-color, var(--ha-card-background, #fff));\r\n  color: var(--primary-text-color, #222);\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 0;\r\n  cursor: pointer;\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  flex: 0 0 auto;\r\n}\r\n\r\n.history-day-btn:hover {\r\n  border-color: var(--primary-color, #03a9f4);\r\n  color: var(--primary-color, #03a9f4);\r\n}\r\n\r\n.history-time-slider {\r\n  width: min(280px, 48vw);\r\n  min-width: 140px;\r\n  accent-color: var(--primary-color, #03a9f4);\r\n  cursor: pointer;\r\n}\r\n\r\n.history-time-value {\r\n  min-width: 42px;\r\n  font-size: 12px;\r\n  font-weight: 600;\r\n  color: var(--primary-text-color, #333);\r\n  text-align: right;\r\n}\r\n\r\n.history-now-btn {\r\n  border: 1px solid var(--divider-color, #d0d0d0);\r\n  border-radius: 12px;\r\n  background: var(--card-background-color, var(--ha-card-background, #fff));\r\n  color: var(--primary-text-color, #222);\r\n  font-size: 11px;\r\n  font-weight: 600;\r\n  line-height: 1;\r\n  padding: 6px 10px;\r\n  cursor: pointer;\r\n}\r\n\r\n.history-now-btn:hover {\r\n  border-color: var(--primary-color, #03a9f4);\r\n  color: var(--primary-color, #03a9f4);\r\n}\r\n\r\n.history-meta {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 12px;\r\n  margin-bottom: 8px;\r\n  color: var(--secondary-text-color, #666);\r\n}\r\n\r\n.history-status {\n  font-weight: 600;\n  color: var(--primary-color, #03a9f4);\n}\n\n.history-energy-sync {\n  display: inline-flex;\n  align-items: center;\n  padding: 2px 8px;\n  border-radius: 999px;\n  border: 1px solid rgba(3, 169, 244, 0.45);\n  background: rgba(3, 169, 244, 0.1);\n  color: var(--primary-color, #03a9f4);\n  font-size: 11px;\n  font-weight: 600;\n  line-height: 1.2;\n}\n\r\n.history-error {\r\n  margin-bottom: 8px;\r\n  font-size: 12px;\r\n  color: #d32f2f;\r\n}\r\n\r\n.canvas-wrapper {\r\n  position: relative;\r\n  margin: 0 auto;\r\n  overflow: hidden;\r\n}\r\n\r\n.canvas-wrapper.interactive {\r\n  touch-action: none;\r\n  cursor: grab;\r\n}\r\n\r\n.canvas-wrapper.interactive:active {\r\n  cursor: grabbing;\r\n}\r\n\r\n.solar-grid-container {\r\n  position: absolute;\r\n  top: 50%;\r\n  left: 50%;\r\n  background: transparent;\r\n  border: 1px solid var(--divider-color);\r\n  cursor: default;\r\n  user-select: none;\r\n  transform-origin: center center;\r\n}\r\n\r\n.background-image {\r\n  position: absolute;\r\n  top: 0;\r\n  left: 0;\r\n  object-fit: none;\r\n  object-position: top left;\r\n  z-index: 0;\r\n  pointer-events: none;\r\n}\r\n\r\n.view-toggle {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 6px;\r\n  background: var(--card-background-color, var(--ha-card-background, #fff));\r\n  border: 1px solid var(--divider-color, #e0e0e0);\r\n  border-radius: 20px;\r\n  padding: 4px 10px;\r\n  cursor: pointer;\r\n  user-select: none;\r\n  white-space: nowrap;\r\n}\r\n\r\n.view-toggle:hover {\r\n  border-color: var(--primary-color, #03a9f4);\r\n}\r\n\r\n.toggle-label {\r\n  font-size: 11px;\r\n  font-weight: 400;\r\n  color: var(--secondary-text-color, #888);\r\n  transition: color 0.2s, font-weight 0.2s;\r\n}\r\n\r\n.toggle-label.active {\r\n  font-weight: 700;\r\n  color: var(--primary-text-color, #333);\r\n}\r\n\r\n.toggle-track {\r\n  position: relative;\r\n  width: 32px;\r\n  height: 16px;\r\n  border-radius: 8px;\r\n  background: var(--disabled-color, #bdbdbd);\r\n  transition: background 0.25s;\r\n}\r\n\r\n.toggle-track.on {\r\n  background: var(--primary-color, #03a9f4);\r\n}\r\n\r\n.toggle-thumb {\r\n  position: absolute;\r\n  top: 2px;\r\n  left: 2px;\r\n  width: 12px;\r\n  height: 12px;\r\n  border-radius: 50%;\r\n  background: white;\r\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);\r\n  transition: left 0.25s;\r\n}\r\n\r\n.toggle-track.on .toggle-thumb {\r\n  left: 18px;\r\n}\r\n\r\n.solar-panel {\r\n  position: absolute;\r\n  cursor: pointer;\r\n  transition: box-shadow 0.2s;\r\n  border-radius: 0;\r\n  overflow: hidden;\r\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\r\n  pointer-events: auto;\r\n  transform-origin: center center;\r\n}\r\n\r\n.solar-panel:hover {\r\n  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);\r\n}\r\n\r\n.panel-background {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 100%;\r\n  top: 0;\r\n  left: 0;\r\n  z-index: 0;\r\n  transition: background-color 0.3s ease;\r\n}\r\n\r\n.panel-image {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 100%;\r\n  object-fit: contain;\r\n  object-position: center;\r\n  z-index: 1;\r\n  opacity: 0.9;\r\n}\r\n\r\n.panel-overlay {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 100%;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  z-index: 2;\r\n}\r\n\r\n.panel-value {\n  background: rgba(0, 0, 0, 0.6);\n  color: white;\n  padding: 4px 6px;\n  border-radius: 3px;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 2px;\n  white-space: nowrap;\n}\n\n.entity-value {\n  display: flex;\n  flex-direction: row;\n  align-items: baseline;\n  gap: 3px;\n  line-height: 1.1;\n}\n\n.value {\n  font-weight: bold;\n}\n\n.value.primary {\n  font-size: var(--font-size-primary, 14px);\n}\n\n.value.secondary {\n  font-size: var(--font-size-secondary, 12px);\n  font-weight: normal;\n}\n\n.unit {\n  font-size: var(--font-size-unit, 10px);\n  font-weight: normal;\n  opacity: 0.8;\n}\n\n.panel-name {\n  font-size: 10px;\n  opacity: 0.9;\n  font-weight: normal;\n  letter-spacing: 0.5px;\n  margin-bottom: 0;\n  width: 100%;\n  text-align: center;\n  line-height: 1;\n}\n\r\n.error {\r\n  color: #ff6b6b;\r\n}\r\n";
 
-    var cardRenderTpl = "<ha-card>\n  <div class=\"card-content\">\n    {{0}}\n    {{1}}\n    {{2}}\n  </div>\n</ha-card>\n";
+    var cardRenderTpl = "<ha-card>\r\n  <div class=\"card-content\">\r\n    {{0}}\r\n    {{1}}\r\n    {{2}}\r\n  </div>\r\n</ha-card>\r\n";
 
-    var cardTopControlsTpl = "<div class=\"top-controls\">\n  <div class=\"history-controls\">\n    <button type=\"button\" class=\"history-day-btn\" @click={{0}} aria-label=\"Previous day\" title=\"Previous day\">&#8249;</button>\n    <button type=\"button\" class=\"history-day-btn\" @click={{1}} aria-label=\"Next day\" title=\"Next day\">&#8250;</button>\n    <label for=\"history-date\" class=\"history-label\">Date</label>\n    <input id=\"history-date\" class=\"history-date-input\" type=\"date\" .value={{2}} @change={{3}} />\n    <label for=\"history-time\" class=\"history-label\">Time</label>\n    <input id=\"history-time\" class=\"history-time-slider\" type=\"range\" min=\"0\" max=\"1439\" step=\"1\" .value={{4}} @input={{5}} />\n    <span class=\"history-time-value\">{{6}}</span>\n    <button type=\"button\" class=\"history-now-btn\" @click={{7}}>Now</button>\n  </div>\n  {{8}}\n</div>\n";
+    var cardTopControlsTpl = "<div class=\"top-controls\">\r\n  <div class=\"history-controls\">\r\n    <button type=\"button\" class=\"history-day-btn\" @click={{0}} aria-label=\"Previous day\" title=\"Previous day\">&#8249;</button>\r\n    <button type=\"button\" class=\"history-day-btn\" @click={{1}} aria-label=\"Next day\" title=\"Next day\">&#8250;</button>\r\n    <label for=\"history-date\" class=\"history-label\">Date</label>\r\n    <input id=\"history-date\" class=\"history-date-input\" type=\"date\" .value={{2}} @change={{3}} />\r\n    <label for=\"history-time\" class=\"history-label\">Time</label>\r\n    <input id=\"history-time\" class=\"history-time-slider\" type=\"range\" min=\"0\" max=\"1439\" step=\"1\" .value={{4}} @input={{5}} />\r\n    <span class=\"history-time-value\">{{6}}</span>\r\n    <button type=\"button\" class=\"history-now-btn\" @click={{7}}>Now</button>\r\n  </div>\r\n  {{8}}\r\n</div>\r\n";
 
-    var cardEnergyToggleTpl = "<div class=\"view-toggle\" @click={{0}} title=\"Toggle between power and energy view\">\n  <span class={{1}}>W</span>\n  <div class={{2}}>\n    <div class=\"toggle-thumb\"></div>\n  </div>\n  <span class={{3}}>kWh</span>\n</div>\n";
+    var cardEnergyToggleTpl = "<div class=\"view-toggle\" @click={{0}} title=\"Toggle between power and energy view\">\r\n  <span class={{1}}>W</span>\r\n  <div class={{2}}>\r\n    <div class=\"toggle-thumb\"></div>\r\n  </div>\r\n  <span class={{3}}>kWh</span>\r\n</div>\r\n";
 
-    var cardHistoryMetaTpl = "<div class=\"history-meta\">\n  <span>Snapshot: {{0}}</span>\n  {{1}}\n</div>\n{{2}}\n";
+    var cardHistoryMetaTpl = "<div class=\"history-meta\">\n  <span>Snapshot: {{0}}</span>\n  {{1}}\n  {{2}}\n</div>\n{{3}}\n";
 
-    var cardHistoryStatusTpl = "<span class=\"history-status\">Loading...</span>\n";
+    var cardHistoryStatusTpl = "<span class=\"history-status\">Loading...</span>\r\n";
 
-    var cardHistoryErrorTpl = "<div class=\"history-error\">{{0}}</div>\n";
+    var cardHistoryErrorTpl = "<div class=\"history-error\">{{0}}</div>\r\n";
 
-    var cardCanvasTpl = "<div class={{0}} style=\"width: {{1}}px; height: {{2}}px;\" @wheel={{3}} @pointerdown={{4}} @pointermove={{5}} @pointerup={{6}} @pointercancel={{7}} @dblclick={{8}}>\n  <div class=\"solar-grid-container\" style=\"width: {{9}}px; height: {{10}}px; margin-left: -{{11}}px; margin-top: -{{12}}px; transform: translate({{13}}px, {{14}}px) scale({{15}}){{16}};\">\n    {{17}}\n    {{18}}\n  </div>\n</div>\n";
+    var cardCanvasTpl = "<div class={{0}} style=\"width: {{1}}px; height: {{2}}px; --font-size-primary: {{19}}px; --font-size-secondary: {{20}}px; --font-size-unit: {{21}}px;\" @wheel={{3}} @pointerdown={{4}} @pointermove={{5}} @pointerup={{6}} @pointercancel={{7}} @dblclick={{8}}>\n  <div class=\"solar-grid-container\" style=\"width: {{9}}px; height: {{10}}px; margin-left: -{{11}}px; margin-top: -{{12}}px; transform: translate({{13}}px, {{14}}px) scale({{15}}){{16}};\">\r\n    {{17}}\r\n    {{18}}\r\n  </div>\r\n</div>\r\n";
 
-    var cardBackgroundImageTpl = "<img src={{0}} alt=\"\" class=\"background-image\" style=\"opacity: {{1}};\" />\n";
+    var cardBackgroundImageTpl = "<img src={{0}} alt=\"\" class=\"background-image\" style=\"opacity: {{1}};\" />\r\n";
 
-    var cardPanelTpl = "<div class=\"solar-panel\" style={{0}} @click={{1}} @mousedown={{2}}>\n  <div class=\"panel-background\" style=\"background-color: {{3}}\"></div>\n  <img src={{4}} alt=\"Solar Panel\" class=\"panel-image\" />\n  <div class=\"panel-overlay\">\n    <div class=\"panel-value\" style={{5}}>\n      {{6}}\n    </div>\n    <div class=\"entity-id-suffix\" style={{7}}>{{8}}</div>\n  </div>\n</div>\n";
+    var cardPanelTpl = "<div class=\"solar-panel\" style={{0}} @click={{1}} @mousedown={{2}}>\r\n  <div class=\"panel-background\" style=\"background-color: {{3}}\"></div>\r\n  <img src={{4}} alt=\"Solar Panel\" class=\"panel-image\" />\r\n  <div class=\"panel-overlay\">\n    <div class=\"panel-value\" style={{5}}>\n      {{6}}\n      {{7}}\n    </div>\n  </div>\n</div>\n";
 
-    var cardPanelValueTpl = "<span class=\"value\">{{0}}</span>\n<span class=\"unit\">{{1}}</span>\n";
+    var cardPanelValueTpl = "<div class=\"entity-value {{2}}\">\n  <span class=\"value {{2}}\">{{0}}</span>\n  <span class=\"unit\">{{1}}</span>\n</div>\n";
 
-    var cardPanelErrorTpl = "<span class=\"error\">N/A</span>\n";
+    var cardPanelErrorTpl = "<span class=\"error\">N/A</span>\r\n";
 
     // default values used throughout the card
     const DEFAULT_GRID_SIZE = 10;
@@ -160,6 +160,10 @@
             this._resizeObserver = undefined;
             this._historyStates = new Map();
             this._historyRequestToken = 0;
+            this._energyCollection = null;
+            this._unsubEnergy = null;
+            this._energyStats = {};
+            this._energyDays = 1;
             this._activePointers = new Map();
             this._isViewportPanning = false;
             this._panStartPoint = { x: 0, y: 0 };
@@ -219,6 +223,10 @@
                     return;
                 }
                 if (event.pointerType === 'mouse' && event.button !== 0) {
+                    return;
+                }
+                const target = event.target;
+                if (target?.closest('.solar-panel')) {
                     return;
                 }
                 const point = this._getPointInViewport(event);
@@ -456,7 +464,7 @@
             });
         }
         _loadViewState() {
-            if (!this.config?.persist_view_state) {
+            if (this.config?.persist_view_state === false) {
                 return false;
             }
             try {
@@ -467,7 +475,7 @@
             }
         }
         _saveViewState(value) {
-            if (!this.config?.persist_view_state) {
+            if (this.config?.persist_view_state === false) {
                 return;
             }
             try {
@@ -477,9 +485,110 @@
                 // Ignore localStorage errors (e.g. private mode / restricted browser context)
             }
         }
+        _clearViewState() {
+            try {
+                localStorage.removeItem(SolarPanelGridCard.VIEW_STATE_STORAGE_KEY);
+            }
+            catch {
+                // Ignore localStorage errors (e.g. private mode / restricted browser context)
+            }
+        }
+        _trySubscribeEnergy() {
+            if (!this.hass?.connection) {
+                return;
+            }
+            const conn = this.hass.connection;
+            const isCollection = (obj) => obj && typeof obj.subscribe === 'function';
+            let collection = null;
+            const panelKey = `_energy_${this.hass.panelUrl}`;
+            if (isCollection(conn[panelKey])) {
+                collection = conn[panelKey];
+            }
+            else if (isCollection(conn._energy)) {
+                collection = conn._energy;
+            }
+            else {
+                for (const key of Object.keys(conn)) {
+                    if (key.startsWith('_energy') && isCollection(conn[key])) {
+                        collection = conn[key];
+                        break;
+                    }
+                }
+            }
+            if (collection && collection !== this._energyCollection) {
+                if (this._unsubEnergy) {
+                    this._unsubEnergy();
+                }
+                this._energyCollection = collection;
+                this._unsubEnergy = collection.subscribe((data) => {
+                    void this._fetchStatistics(data);
+                });
+            }
+        }
+        async _fetchStatistics(energyData) {
+            if (!energyData?.start || !this.hass?.callWS) {
+                return;
+            }
+            const start = energyData.start;
+            const end = energyData.end || new Date();
+            let days = 1;
+            if (start && end) {
+                const diffTime = Math.abs(end.valueOf() - start.valueOf());
+                days = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+            }
+            this._energyDays = days;
+            const today = new Date();
+            const startIsToday = start.getDate() === today.getDate()
+                && start.getMonth() === today.getMonth()
+                && start.getFullYear() === today.getFullYear();
+            if (startIsToday && days <= 1) {
+                this._energyStats = {};
+                this.requestUpdate();
+                return;
+            }
+            const statisticIds = Array.from(this.panels.values())
+                .map((p) => p.config.entity_energy)
+                .filter((id) => !!id);
+            if (statisticIds.length === 0) {
+                return;
+            }
+            try {
+                const stats = await this.hass.callWS({
+                    type: 'recorder/statistics_during_period',
+                    start_time: start.toISOString(),
+                    end_time: end.toISOString(),
+                    statistic_ids: statisticIds,
+                    period: 'hour',
+                    types: ['change'],
+                });
+                const newStats = {};
+                for (const id of statisticIds) {
+                    const rows = stats?.[id];
+                    if (rows && Array.isArray(rows)) {
+                        newStats[id] = rows.reduce((sum, val) => sum + (val.change || 0), 0);
+                    }
+                }
+                this._energyStats = newStats;
+                this.requestUpdate();
+            }
+            catch (err) {
+                console.warn('[SolarPanelGridCard] Failed to fetch recorder statistics', err);
+            }
+        }
         update(changedProperties) {
             super.update(changedProperties);
             if (changedProperties.has('config')) {
+                const previousConfig = changedProperties.get('config');
+                const persistChanged = previousConfig?.persist_view_state !== this.config?.persist_view_state;
+                if (persistChanged) {
+                    if (this.config?.persist_view_state === false) {
+                        this._showEnergy = false;
+                        this._clearViewState();
+                    }
+                    else {
+                        this._showEnergy = this._loadViewState();
+                    }
+                }
                 // rebuild panels map whenever config changes
                 this.panels.clear();
                 if (this.config?.panels) {
@@ -491,8 +600,12 @@
                         });
                     });
                 }
+                this._trySubscribeEnergy();
             }
             if (changedProperties.has('hass') && this.hass) {
+                if (!this._energyCollection) {
+                    this._trySubscribeEnergy();
+                }
                 // Update just the entity references when hass updates
                 this.panels.forEach((panel, entity) => {
                     panel.entity = this.hass.states[entity];
@@ -518,6 +631,11 @@
         }
         disconnectedCallback() {
             super.disconnectedCallback();
+            if (this._unsubEnergy) {
+                this._unsubEnergy();
+                this._unsubEnergy = null;
+            }
+            this._energyCollection = null;
             if (this._resizeObserver) {
                 this._resizeObserver.disconnect();
             }
@@ -550,6 +668,17 @@
             if (!this._selectedDate)
                 return false;
             return this._selectedDate === this._toDateInputValue(new Date());
+        }
+        _isLiveSnapshotSelected() {
+            if (!this._isTodaySelected()) {
+                return false;
+            }
+            const now = new Date();
+            const nowMinutes = now.getHours() * 60 + now.getMinutes();
+            return Math.abs(this._selectedMinute - nowMinutes) <= 1;
+        }
+        _isEnergyDateSelectionActive() {
+            return this._isLiveSnapshotSelected() && !!this._energyCollection;
         }
         _getSelectedDateTime() {
             const [y, m, d] = this._selectedDate.split('-').map((n) => Number(n));
@@ -665,14 +794,30 @@
         getProductionValue(entity) {
             if (!entity)
                 return 0;
+            if (this._isLiveSnapshotSelected() && this._energyStats[entity.entity_id] !== undefined) {
+                return this._energyStats[entity.entity_id];
+            }
             const value = parseFloat(entity.state);
             return isNaN(value) ? 0 : value;
+        }
+        getDecimalsForEntity(entity) {
+            const unit = entity?.attributes?.unit_of_measurement || '';
+            const raw = (unit === 'kWh' || unit === 'Wh')
+                ? this.config.energy_decimals
+                : this.config.power_decimals;
+            const defaultValue = (unit === 'kWh' || unit === 'Wh') ? 2 : 0;
+            const parsed = Number(raw);
+            if (!Number.isFinite(parsed)) {
+                return defaultValue;
+            }
+            return Math.max(0, Math.min(6, Math.round(parsed)));
         }
         getMaxValue(panelConfig, unit) {
             if (unit === 'kWh' || unit === 'Wh') {
                 const maxDaily = panelConfig.max_daily_production || 5.5;
+                const periodMax = this._isLiveSnapshotSelected() ? maxDaily * (this._energyDays || 1) : maxDaily;
                 // If unit is Wh, convert max_daily_production from kWh to Wh
-                return unit === 'Wh' ? maxDaily * 1000 : maxDaily;
+                return unit === 'Wh' ? periodMax * 1000 : periodMax;
             }
             return panelConfig.max_production || 400;
         }
@@ -1005,7 +1150,10 @@
         _renderHistoryMeta(selectedDateTimeLabel) {
             const statusMarkup = this._historyLoading ? htmlFromTpl(cardHistoryStatusTpl) : '';
             const errorMarkup = this._historyError ? htmlFromTpl(cardHistoryErrorTpl, this._historyError) : '';
-            return htmlFromTpl(cardHistoryMetaTpl, selectedDateTimeLabel, statusMarkup, errorMarkup);
+            const energySyncMarkup = this._isEnergyDateSelectionActive()
+                ? htmlFromTpl('<span class="history-energy-sync">Synced with Energy date filter</span>')
+                : '';
+            return htmlFromTpl(cardHistoryMetaTpl, selectedDateTimeLabel, statusMarkup, energySyncMarkup, errorMarkup);
         }
         _renderPanel(entityId, panel, canvasRotation) {
             const rotation = panel.config.rotation || 0;
@@ -1013,22 +1161,37 @@
             const activeEntityId = (this._showEnergy && panel.config.entity_energy)
                 ? panel.config.entity_energy
                 : entityId;
+            const secondaryEntityId = (this._showEnergy && panel.config.entity_energy)
+                ? entityId
+                : panel.config.entity_energy;
             const activeEntity = this._getDisplayEntity(activeEntityId);
+            const secondaryEntity = secondaryEntityId ? this._getDisplayEntity(secondaryEntityId) : undefined;
+            const showSecondary = this.config.show_secondary === true;
             const panelStyle = `left: ${panel.config.x}px; top: ${panel.config.y}px; width: ${this.panelWidth}px; height: ${this.panelHeight}px;${rotation ? ` transform: rotate(${rotation}deg);` : ''}`;
             const panelValueStyle = totalRotation ? `transform: rotate(${-totalRotation}deg)` : '';
-            const entitySuffixStyle = totalRotation ? `transform: rotate(${-totalRotation}deg)` : '';
             const backgroundColor = this.getProductionColor(this.getProductionValue(activeEntity), this.getMaxValue(panel.config, activeEntity?.attributes.unit_of_measurement || 'W'));
-            const panelValueMarkup = activeEntity
-                ? htmlFromTpl(cardPanelValueTpl, this.getProductionValue(activeEntity).toFixed(1), activeEntity.attributes.unit_of_measurement || '')
+            const primaryPanelValueMarkup = activeEntity
+                ? htmlFromTpl(cardPanelValueTpl, this.getProductionValue(activeEntity).toLocaleString(this.hass?.locale?.language || undefined, {
+                    minimumFractionDigits: this.getDecimalsForEntity(activeEntity),
+                    maximumFractionDigits: this.getDecimalsForEntity(activeEntity),
+                }), activeEntity.attributes.unit_of_measurement || '', 'primary')
                 : htmlFromTpl(cardPanelErrorTpl);
-            return htmlFromTpl(cardPanelTpl, panelStyle, (e) => this.onPanelClick(e, entityId), (e) => this.onPanelMouseDown(e, entityId), backgroundColor, this.panelImage, panelValueStyle, panelValueMarkup, entitySuffixStyle, this.getPanelDisplayName(entityId, panel.config));
+            const secondaryPanelValueMarkup = showSecondary && secondaryEntity
+                ? htmlFromTpl(cardPanelValueTpl, this.getProductionValue(secondaryEntity).toLocaleString(this.hass?.locale?.language || undefined, {
+                    minimumFractionDigits: this.getDecimalsForEntity(secondaryEntity),
+                    maximumFractionDigits: this.getDecimalsForEntity(secondaryEntity),
+                }), secondaryEntity.attributes.unit_of_measurement || '', 'secondary')
+                : '';
+            const panelDisplayName = this.config.show_name === false ? '' : this.getPanelDisplayName(entityId, panel.config);
+            const panelNameMarkup = panelDisplayName ? htmlFromTpl('<div class="panel-name">{{0}}</div>', panelDisplayName) : '';
+            return htmlFromTpl(cardPanelTpl, panelStyle, (e) => this.onPanelClick(e, entityId), (e) => this.onPanelMouseDown(e, entityId), backgroundColor, this.panelImage, panelValueStyle, panelNameMarkup, [primaryPanelValueMarkup, secondaryPanelValueMarkup]);
         }
         _renderCanvas(size, canvasRotation, bgImage, bgOpacity, wrapperWidth, wrapperHeight, liveInteractionEnabled, panX, panY, combinedScale) {
             const wrapperClass = `canvas-wrapper ${liveInteractionEnabled ? 'interactive' : ''}`;
             const rotationStyle = canvasRotation ? ` rotate(${canvasRotation}deg)` : '';
             const backgroundMarkup = bgImage ? htmlFromTpl(cardBackgroundImageTpl, bgImage, bgOpacity) : '';
             const panelMarkup = Array.from(this.panels.entries()).map(([entityId, panel]) => this._renderPanel(entityId, panel, canvasRotation));
-            return htmlFromTpl(cardCanvasTpl, wrapperClass, wrapperWidth, wrapperHeight, this._onViewportWheel, this._onViewportPointerDown, this._onViewportPointerMove, this._onViewportPointerUp, this._onViewportPointerUp, this._resetViewportTransform, size.width, size.height, size.width / 2, size.height / 2, panX, panY, combinedScale, rotationStyle, backgroundMarkup, panelMarkup);
+            return htmlFromTpl(cardCanvasTpl, wrapperClass, wrapperWidth, wrapperHeight, this._onViewportWheel, this._onViewportPointerDown, this._onViewportPointerMove, this._onViewportPointerUp, this._onViewportPointerUp, this._resetViewportTransform, size.width, size.height, size.width / 2, size.height / 2, panX, panY, combinedScale, rotationStyle, backgroundMarkup, panelMarkup, this.config.font_size_primary ?? 14, this.config.font_size_secondary ?? 12, this.config.font_size_unit ?? 10);
         }
         render() {
             const size = this.getContainerSize();
@@ -1056,27 +1219,27 @@
     // Register the custom element
     customElements.define('solar-panel-grid-card', SolarPanelGridCard);
 
-    var editorStyles = ":host {\n  display: block;\n}\n\n.card-config {\n  padding: 16px;\n}\n\nh2 {\n  margin: 16px 0 8px 0;\n  font-size: 16px;\n  font-weight: 500;\n}\n\n.panels-info {\n  background: var(--secondary-background-color);\n  padding: 12px;\n  border-radius: 4px;\n  margin-top: 8px;\n}\n\n.panels-info p {\n  margin: 8px 0;\n  font-size: 14px;\n}\n\n.panels-config {\n  background: var(--secondary-background-color);\n  padding: 12px;\n  border-radius: 4px;\n  margin-top: 8px;\n}\n\n.panels-config p {\n  margin: 8px 0;\n  font-size: 13px;\n}\n\n.panels-form {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n  margin-top: 12px;\n}\n\n.panel-config-item {\n  background: var(--primary-background-color);\n  border: 1px solid var(--divider-color);\n  border-radius: 4px;\n  overflow: hidden;\n}\n\n.panel-header {\n  padding: 12px;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  border-left: 3px solid var(--primary-color);\n  user-select: none;\n  transition: background-color 0.2s;\n}\n\n.panel-header:hover {\n  background-color: var(--secondary-background-color);\n}\n\n.panel-header-content {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  flex: 1;\n}\n\n.panel-toggle-icon {\n  font-size: 14px;\n  width: 20px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  color: var(--primary-color);\n}\n\n.panel-entity-name {\n  font-weight: 500;\n  color: var(--primary-text-color);\n}\n\n.panel-content {\n  padding: 12px;\n  border-top: 1px solid var(--divider-color);\n  background-color: var(--secondary-background-color);\n}\n\n.config-row {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  margin: 8px 0;\n}\n\n.config-row label {\n  min-width: 150px;\n  font-size: 13px;\n  font-weight: 500;\n}\n\n.config-row ha-entity-picker {\n  flex: 1;\n}\n\n.config-row ha-textfield {\n  flex: 1;\n  max-width: 150px;\n}\n\n.slider-row {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  flex: 1;\n}\n\n.rotation-slider {\n  flex: 1;\n  -webkit-appearance: none;\n  appearance: none;\n  height: 6px;\n  border-radius: 3px;\n  background: var(--disabled-color, #bdbdbd);\n  outline: none;\n  cursor: pointer;\n}\n\n.rotation-slider::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: var(--primary-color, #03a9f4);\n  cursor: pointer;\n}\n\n.rotation-slider::-moz-range-thumb {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: var(--primary-color, #03a9f4);\n  border: none;\n  cursor: pointer;\n}\n\n.slider-value {\n  min-width: 40px;\n  text-align: right;\n  font-size: 12px;\n  color: var(--primary-text-color);\n}\n\n.entity-select {\n  flex: 1;\n  padding: 8px 12px;\n  border: 1px solid var(--divider-color);\n  border-radius: 4px;\n  background-color: var(--primary-background-color);\n  color: var(--primary-text-color);\n  font-size: 14px;\n  font-family: inherit;\n  cursor: pointer;\n}\n\n.entity-select:focus {\n  outline: none;\n  border-color: var(--primary-color);\n  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);\n}\n\n.entity-select option {\n  background-color: var(--secondary-background-color);\n  color: var(--primary-text-color);\n}\n\n.delete-btn {\n  margin-top: 8px;\n}\n\nha-button {\n  display: block;\n  margin: 12px 0;\n}\n\n.yaml-note {\n  margin-top: 12px;\n  font-size: 12px;\n  font-style: italic;\n  color: var(--secondary-text-color);\n}\n\n.panels-list {\n  margin-top: 12px;\n  padding: 8px 0;\n}\n\n.panels-list > p {\n  margin: 8px 0;\n  font-size: 13px;\n}\n\n.panel-item {\n  padding: 8px 8px;\n  margin: 4px 0;\n  font-size: 12px;\n  background: var(--primary-background-color);\n  border-left: 2px solid var(--primary-color);\n  border-radius: 2px;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n\n.position {\n  color: var(--secondary-text-color);\n  font-size: 11px;\n  margin-left: 8px;\n}\n\n.no-panels {\n  font-style: italic;\n  color: var(--secondary-text-color);\n}\n";
+    var editorStyles = ":host {\r\n  display: block;\r\n}\r\n\r\n.card-config {\r\n  padding: 16px;\r\n}\r\n\r\nh2 {\r\n  margin: 16px 0 8px 0;\r\n  font-size: 16px;\r\n  font-weight: 500;\r\n}\r\n\r\n.panels-info {\r\n  background: var(--secondary-background-color);\r\n  padding: 12px;\r\n  border-radius: 4px;\r\n  margin-top: 8px;\r\n}\r\n\r\n.panels-info p {\r\n  margin: 8px 0;\r\n  font-size: 14px;\r\n}\r\n\r\n.panels-config {\r\n  background: var(--secondary-background-color);\r\n  padding: 12px;\r\n  border-radius: 4px;\r\n  margin-top: 8px;\r\n}\r\n\r\n.panels-config p {\r\n  margin: 8px 0;\r\n  font-size: 13px;\r\n}\r\n\r\n.panels-form {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 16px;\r\n  margin-top: 12px;\r\n}\r\n\r\n.panel-config-item {\r\n  background: var(--primary-background-color);\r\n  border: 1px solid var(--divider-color);\r\n  border-radius: 4px;\r\n  overflow: hidden;\r\n}\r\n\r\n.panel-header {\r\n  padding: 12px;\r\n  cursor: pointer;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: space-between;\r\n  border-left: 3px solid var(--primary-color);\r\n  user-select: none;\r\n  transition: background-color 0.2s;\r\n}\r\n\r\n.panel-header:hover {\r\n  background-color: var(--secondary-background-color);\r\n}\r\n\r\n.panel-header-content {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 12px;\r\n  flex: 1;\r\n}\r\n\r\n.panel-toggle-icon {\r\n  font-size: 14px;\r\n  width: 20px;\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  color: var(--primary-color);\r\n}\r\n\r\n.panel-entity-name {\r\n  font-weight: 500;\r\n  color: var(--primary-text-color);\r\n}\r\n\r\n.panel-content {\r\n  padding: 12px;\r\n  border-top: 1px solid var(--divider-color);\r\n  background-color: var(--secondary-background-color);\r\n}\r\n\r\n.config-row {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 12px;\r\n  margin: 8px 0;\r\n}\r\n\r\n.config-row label {\r\n  min-width: 150px;\r\n  font-size: 13px;\r\n  font-weight: 500;\r\n}\r\n\r\n.config-row ha-entity-picker {\r\n  flex: 1;\r\n}\r\n\r\n.config-row ha-textfield {\r\n  flex: 1;\r\n  max-width: 150px;\r\n}\r\n\r\n.slider-row {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  flex: 1;\r\n}\r\n\r\n.rotation-slider {\r\n  flex: 1;\r\n  -webkit-appearance: none;\r\n  appearance: none;\r\n  height: 6px;\r\n  border-radius: 3px;\r\n  background: var(--disabled-color, #bdbdbd);\r\n  outline: none;\r\n  cursor: pointer;\r\n}\r\n\r\n.rotation-slider::-webkit-slider-thumb {\r\n  -webkit-appearance: none;\r\n  appearance: none;\r\n  width: 16px;\r\n  height: 16px;\r\n  border-radius: 50%;\r\n  background: var(--primary-color, #03a9f4);\r\n  cursor: pointer;\r\n}\r\n\r\n.rotation-slider::-moz-range-thumb {\r\n  width: 16px;\r\n  height: 16px;\r\n  border-radius: 50%;\r\n  background: var(--primary-color, #03a9f4);\r\n  border: none;\r\n  cursor: pointer;\r\n}\r\n\r\n.slider-value {\r\n  min-width: 40px;\r\n  text-align: right;\r\n  font-size: 12px;\r\n  color: var(--primary-text-color);\r\n}\r\n\r\n.entity-select {\r\n  flex: 1;\r\n  padding: 8px 12px;\r\n  border: 1px solid var(--divider-color);\r\n  border-radius: 4px;\r\n  background-color: var(--primary-background-color);\r\n  color: var(--primary-text-color);\r\n  font-size: 14px;\r\n  font-family: inherit;\r\n  cursor: pointer;\r\n}\r\n\r\n.entity-select:focus {\r\n  outline: none;\r\n  border-color: var(--primary-color);\r\n  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);\r\n}\r\n\r\n.entity-select option {\r\n  background-color: var(--secondary-background-color);\r\n  color: var(--primary-text-color);\r\n}\r\n\r\n.delete-btn {\r\n  margin-top: 8px;\r\n}\r\n\r\nha-button {\r\n  display: block;\r\n  margin: 12px 0;\r\n}\r\n\r\n.yaml-note {\r\n  margin-top: 12px;\r\n  font-size: 12px;\r\n  font-style: italic;\r\n  color: var(--secondary-text-color);\r\n}\r\n\r\n.panels-list {\r\n  margin-top: 12px;\r\n  padding: 8px 0;\r\n}\r\n\r\n.panels-list > p {\r\n  margin: 8px 0;\r\n  font-size: 13px;\r\n}\r\n\r\n.panel-item {\r\n  padding: 8px 8px;\r\n  margin: 4px 0;\r\n  font-size: 12px;\r\n  background: var(--primary-background-color);\r\n  border-left: 2px solid var(--primary-color);\r\n  border-radius: 2px;\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n}\r\n\r\n.position {\r\n  color: var(--secondary-text-color);\r\n  font-size: 11px;\r\n  margin-left: 8px;\r\n}\r\n\r\n.no-panels {\r\n  font-style: italic;\r\n  color: var(--secondary-text-color);\r\n}\r\n";
 
-    var editorLoadingTpl = "<p>Loading...</p>\n";
+    var editorLoadingTpl = "<p>Loading...</p>\r\n";
 
-    var editorRenderTpl = "<div class=\"card-config\">\n  <h2>Grid Settings</h2>\n  <ha-form\n    .hass={{0}}\n    .data={{1}}\n    .schema={{2}}\n    .computeLabel={{3}}\n    @value-changed={{4}}\n  ></ha-form>\n\n  <h2>Panel Entities</h2>\n  <div class=\"panels-config\">\n    <p>Configure sensor entities for each panel:</p>\n    {{5}}\n  </div>\n\n  <h2>Add Panel</h2>\n  <div class=\"panels-config\">\n    <ha-button @click={{6}}>Add Panel</ha-button>\n  </div>\n\n  <h2>Panel Positions</h2>\n  <div class=\"panels-info\">\n    <p>Drag panels in the card preview - positions update automatically!</p>\n    <div class=\"panels-list\">\n      {{7}}\n    </div>\n    <p class=\"yaml-note\">Positions sync automatically as you drag in the preview!</p>\n  </div>\n</div>\n";
+    var editorRenderTpl = "<div class=\"card-config\">\r\n  <h2>Grid Settings</h2>\r\n  <ha-form\r\n    .hass={{0}}\r\n    .data={{1}}\r\n    .schema={{2}}\r\n    .computeLabel={{3}}\r\n    @value-changed={{4}}\r\n  ></ha-form>\r\n\r\n  <h2>Panel Entities</h2>\r\n  <div class=\"panels-config\">\r\n    <p>Configure sensor entities for each panel:</p>\r\n    {{5}}\r\n  </div>\r\n\r\n  <h2>Add Panel</h2>\r\n  <div class=\"panels-config\">\r\n    <ha-button @click={{6}}>Add Panel</ha-button>\r\n  </div>\r\n\r\n  <h2>Panel Positions</h2>\r\n  <div class=\"panels-info\">\r\n    <p>Drag panels in the card preview - positions update automatically!</p>\r\n    <div class=\"panels-list\">\r\n      {{7}}\r\n    </div>\r\n    <p class=\"yaml-note\">Positions sync automatically as you drag in the preview!</p>\r\n  </div>\r\n</div>\r\n";
 
-    var editorPanelsFormTpl = "<div class=\"panels-form\">\n  {{0}}\n</div>\n";
+    var editorPanelsFormTpl = "<div class=\"panels-form\">\r\n  {{0}}\r\n</div>\r\n";
 
-    var editorNoPanelsTpl = "<p class=\"no-panels\">No panels configured. Edit the YAML to add panels.</p>\n";
+    var editorNoPanelsTpl = "<p class=\"no-panels\">No panels configured. Edit the YAML to add panels.</p>\r\n";
 
-    var editorPanelItemTpl = "<div class={{0}}>\n  <div class=\"panel-header\" @click={{1}}>\n    <div class=\"panel-header-content\">\n      <span class=\"panel-toggle-icon\">{{2}}</span>\n      <span class=\"panel-entity-name\">{{3}}</span>\n    </div>\n  </div>\n  {{4}}\n</div>\n";
+    var editorPanelItemTpl = "<div class={{0}}>\r\n  <div class=\"panel-header\" @click={{1}}>\r\n    <div class=\"panel-header-content\">\r\n      <span class=\"panel-toggle-icon\">{{2}}</span>\r\n      <span class=\"panel-entity-name\">{{3}}</span>\r\n    </div>\r\n  </div>\r\n  {{4}}\r\n</div>\r\n";
 
-    var editorPanelContentTpl = "<div class=\"panel-content\">\n  <div class=\"config-row\">\n    <label>Name:</label>\n    <ha-textfield\n      .value={{0}}\n      data-config-value=\"name\"\n      data-index={{1}}\n      @input={{2}}\n    ></ha-textfield>\n  </div>\n  <div class=\"config-row\">\n    <label for={{3}}>Power Entity:</label>\n    <select\n      id={{3}}\n      .value={{4}}\n      data-config-value=\"entity\"\n      data-index={{1}}\n      @change={{5}}\n      class=\"entity-select\"\n    >\n      <option value=\"\">Select a power sensor...</option>\n      {{6}}\n    </select>\n  </div>\n  <div class=\"config-row\">\n    <label for={{7}}>Energy Entity:</label>\n    <select\n      id={{7}}\n      .value={{8}}\n      data-config-value=\"entity_energy\"\n      data-index={{1}}\n      @change={{5}}\n      class=\"entity-select\"\n    >\n      <option value=\"\">Select an energy sensor...</option>\n      {{9}}\n    </select>\n  </div>\n  <div class=\"config-row\">\n    <label>Rotation (°):</label>\n    <div class=\"slider-row\">\n      <input\n        type=\"range\"\n        min=\"-180\"\n        max=\"180\"\n        step=\"5\"\n        .value={{10}}\n        data-config-value=\"rotation\"\n        data-index={{1}}\n        @input={{2}}\n        class=\"rotation-slider\"\n      />\n      <span class=\"slider-value\">{{11}}°</span>\n    </div>\n  </div>\n  <div class=\"config-row\">\n    <label>Max Production (W):</label>\n    <ha-textfield\n      type=\"number\"\n      .value={{12}}\n      data-config-value=\"max_production\"\n      data-index={{1}}\n      @input={{2}}\n    ></ha-textfield>\n  </div>\n  <div class=\"config-row\">\n    <label>Max Daily Production (kWh):</label>\n    <ha-textfield\n      type=\"number\"\n      .value={{13}}\n      data-config-value=\"max_daily_production\"\n      data-index={{1}}\n      @input={{2}}\n    ></ha-textfield>\n  </div>\n  <div class=\"config-row\">\n    <ha-button @click={{14}} class=\"delete-btn\">\n      Delete Panel\n    </ha-button>\n  </div>\n</div>\n";
+    var editorPanelContentTpl = "<div class=\"panel-content\">\r\n  <div class=\"config-row\">\r\n    <label>Name:</label>\r\n    <ha-textfield\r\n      .value={{0}}\r\n      data-config-value=\"name\"\r\n      data-index={{1}}\r\n      @input={{2}}\r\n    ></ha-textfield>\r\n  </div>\r\n  <div class=\"config-row\">\r\n    <label for={{3}}>Power Entity:</label>\r\n    <select\r\n      id={{3}}\r\n      .value={{4}}\r\n      data-config-value=\"entity\"\r\n      data-index={{1}}\r\n      @change={{5}}\r\n      class=\"entity-select\"\r\n    >\r\n      <option value=\"\">Select a power sensor...</option>\r\n      {{6}}\r\n    </select>\r\n  </div>\r\n  <div class=\"config-row\">\r\n    <label for={{7}}>Energy Entity:</label>\r\n    <select\r\n      id={{7}}\r\n      .value={{8}}\r\n      data-config-value=\"entity_energy\"\r\n      data-index={{1}}\r\n      @change={{5}}\r\n      class=\"entity-select\"\r\n    >\r\n      <option value=\"\">Select an energy sensor...</option>\r\n      {{9}}\r\n    </select>\r\n  </div>\r\n  <div class=\"config-row\">\r\n    <label>Rotation (°):</label>\r\n    <div class=\"slider-row\">\r\n      <input\r\n        type=\"range\"\r\n        min=\"-180\"\r\n        max=\"180\"\r\n        step=\"5\"\r\n        .value={{10}}\r\n        data-config-value=\"rotation\"\r\n        data-index={{1}}\r\n        @input={{2}}\r\n        class=\"rotation-slider\"\r\n      />\r\n      <span class=\"slider-value\">{{11}}°</span>\r\n    </div>\r\n  </div>\r\n  <div class=\"config-row\">\r\n    <label>Max Production (W):</label>\r\n    <ha-textfield\r\n      type=\"number\"\r\n      .value={{12}}\r\n      data-config-value=\"max_production\"\r\n      data-index={{1}}\r\n      @input={{2}}\r\n    ></ha-textfield>\r\n  </div>\r\n  <div class=\"config-row\">\r\n    <label>Max Daily Production (kWh):</label>\r\n    <ha-textfield\r\n      type=\"number\"\r\n      .value={{13}}\r\n      data-config-value=\"max_daily_production\"\r\n      data-index={{1}}\r\n      @input={{2}}\r\n    ></ha-textfield>\r\n  </div>\r\n  <div class=\"config-row\">\r\n    <ha-button @click={{14}} class=\"delete-btn\">\r\n      Delete Panel\r\n    </ha-button>\r\n  </div>\r\n</div>\r\n";
 
-    var editorEntityOptionTpl = "<option value={{0}} ?selected={{1}}>{{2}}</option>\n";
+    var editorEntityOptionTpl = "<option value={{0}} ?selected={{1}}>{{2}}</option>\r\n";
 
-    var editorPositionsSummaryTpl = "<p><strong>Current panels ({{0}}):</strong></p>\n{{1}}\n";
+    var editorPositionsSummaryTpl = "<p><strong>Current panels ({{0}}):</strong></p>\r\n{{1}}\r\n";
 
-    var editorPositionItemTpl = "<div class=\"panel-item\">\n  <span>{{0}}</span>\n  <span class=\"position\">{{1}}</span>\n</div>\n";
+    var editorPositionItemTpl = "<div class=\"panel-item\">\r\n  <span>{{0}}</span>\r\n  <span class=\"position\">{{1}}</span>\r\n</div>\r\n";
 
-    var editorPositionsEmptyTpl = "<p class=\"no-panels\">No panels configured</p>\n";
+    var editorPositionsEmptyTpl = "<p class=\"no-panels\">No panels configured</p>\r\n";
 
     /**
      * Custom editor component for Solar Panel Grid Card
@@ -1102,6 +1265,13 @@
                     canvas_height: 'Canvas Height (px)',
                     canvas_rotation: 'Canvas Rotation (°)',
                     persist_view_state: 'Remember W / kWh Toggle State',
+                    show_secondary: 'Show Secondary Value (W + kWh)',
+                    show_name: 'Show Panel Name Badge',
+                    font_size_primary: 'Primary Value Font Size (px)',
+                    font_size_secondary: 'Secondary Value Font Size (px)',
+                    font_size_unit: 'Unit Font Size (px)',
+                    power_decimals: 'Power Decimals (W)',
+                    energy_decimals: 'Energy Decimals (kWh/Wh)',
                 };
                 return labels[schema.name] || schema.name;
             };
@@ -1283,7 +1453,14 @@
                 grid_size: 10,
                 panel_width: 80,
                 panel_height: 144,
-                persist_view_state: false,
+                persist_view_state: true,
+                show_secondary: false,
+                show_name: true,
+                font_size_primary: 14,
+                font_size_secondary: 12,
+                font_size_unit: 10,
+                power_decimals: 0,
+                energy_decimals: 2,
             };
         }
         connectedCallback() {
@@ -1407,6 +1584,78 @@
                     required: false,
                     selector: {
                         boolean: {},
+                    },
+                },
+                {
+                    name: 'show_secondary',
+                    required: false,
+                    selector: {
+                        boolean: {},
+                    },
+                },
+                {
+                    name: 'show_name',
+                    required: false,
+                    selector: {
+                        boolean: {},
+                    },
+                },
+                {
+                    name: 'font_size_primary',
+                    required: false,
+                    selector: {
+                        number: {
+                            min: 8,
+                            max: 48,
+                            step: 1,
+                            unit_of_measurement: 'px',
+                        },
+                    },
+                },
+                {
+                    name: 'font_size_secondary',
+                    required: false,
+                    selector: {
+                        number: {
+                            min: 8,
+                            max: 48,
+                            step: 1,
+                            unit_of_measurement: 'px',
+                        },
+                    },
+                },
+                {
+                    name: 'font_size_unit',
+                    required: false,
+                    selector: {
+                        number: {
+                            min: 8,
+                            max: 32,
+                            step: 1,
+                            unit_of_measurement: 'px',
+                        },
+                    },
+                },
+                {
+                    name: 'power_decimals',
+                    required: false,
+                    selector: {
+                        number: {
+                            min: 0,
+                            max: 6,
+                            step: 1,
+                        },
+                    },
+                },
+                {
+                    name: 'energy_decimals',
+                    required: false,
+                    selector: {
+                        number: {
+                            min: 0,
+                            max: 6,
+                            step: 1,
+                        },
                     },
                 },
             ];

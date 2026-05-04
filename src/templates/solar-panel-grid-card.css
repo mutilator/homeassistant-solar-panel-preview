@@ -117,6 +117,19 @@ ha-card {
   color: var(--primary-color, #03a9f4);
 }
 
+.history-energy-sync {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(3, 169, 244, 0.45);
+  background: rgba(3, 169, 244, 0.1);
+  color: var(--primary-color, #03a9f4);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 .history-error {
   margin-bottom: 8px;
   font-size: 12px;
@@ -265,34 +278,51 @@ ha-card {
 .panel-value {
   background: rgba(0, 0, 0, 0.6);
   color: white;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
+  padding: 4px 6px;
+  border-radius: 3px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  white-space: nowrap;
+}
+
+.entity-value {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 3px;
+  line-height: 1.1;
 }
 
 .value {
-  font-size: 14px;
+  font-weight: bold;
+}
+
+.value.primary {
+  font-size: var(--font-size-primary, 14px);
+}
+
+.value.secondary {
+  font-size: var(--font-size-secondary, 12px);
+  font-weight: normal;
 }
 
 .unit {
-  font-size: 10px;
+  font-size: var(--font-size-unit, 10px);
+  font-weight: normal;
   opacity: 0.8;
 }
 
-.entity-id-suffix {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  font-size: 9px;
-  padding: 2px 6px;
-  border-radius: 3px;
+.panel-name {
+  font-size: 10px;
+  opacity: 0.9;
+  font-weight: normal;
+  letter-spacing: 0.5px;
+  margin-bottom: 0;
+  width: 100%;
+  text-align: center;
+  line-height: 1;
 }
 
 .error {

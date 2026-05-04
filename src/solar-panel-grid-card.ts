@@ -37,6 +37,13 @@ interface SolarPanelGridCardConfig {
   background_image?: string;
   background_opacity?: number;
   persist_view_state?: boolean; // persist W/kWh toggle state in localStorage
+  show_secondary?: boolean; // show the non-active unit value under the primary one
+  show_name?: boolean; // show panel display name badge
+  font_size_primary?: number;
+  font_size_secondary?: number;
+  font_size_unit?: number;
+  power_decimals?: number;
+  energy_decimals?: number;
 }
 
 // default values used throughout the card
@@ -60,6 +67,12 @@ interface Hass {
   states: Record<string, HassEntity>;
   callService: (domain: string, service: string, data?: any) => Promise<void>;
   callApi?: <T = any>(method: string, path: string, parameters?: Record<string, any>) => Promise<T>;
+  callWS?: <T = any>(msg: Record<string, any>) => Promise<T>;
+  connection?: Record<string, any>;
+  panelUrl?: string;
+  locale?: {
+    language?: string;
+  };
 }
 
 // Helper function to convert HSL to RGB
@@ -144,6 +157,10 @@ export class SolarPanelGridCard extends LitElement {
   private _historyStates: Map<string, HassEntity> = new Map();
   private _historyDebounceTimer: number | undefined;
   private _historyRequestToken = 0;
+  private _energyCollection: any = null;
+  private _unsubEnergy: (() => void) | null = null;
+  private _energyStats: Record<string, number> = {};
+  private _energyDays = 1;
   private _activePointers: Map<number, { x: number; y: number }> = new Map();
   private _isViewportPanning = false;
   private _panStartPoint = { x: 0, y: 0 };
@@ -255,7 +272,7 @@ export class SolarPanelGridCard extends LitElement {
   }
 
   private _loadViewState(): boolean {
-    if (!this.config?.persist_view_state) {
+    if (this.config?.persist_view_state === false) {
       return false;
     }
 
@@ -267,7 +284,7 @@ export class SolarPanelGridCard extends LitElement {
   }
 
   private _saveViewState(value: boolean): void {
-    if (!this.config?.persist_view_state) {
+    if (this.config?.persist_view_state === false) {
       return;
     }
 
@@ -278,10 +295,122 @@ export class SolarPanelGridCard extends LitElement {
     }
   }
 
+  private _clearViewState(): void {
+    try {
+      localStorage.removeItem(SolarPanelGridCard.VIEW_STATE_STORAGE_KEY);
+    } catch {
+      // Ignore localStorage errors (e.g. private mode / restricted browser context)
+    }
+  }
+
+  private _trySubscribeEnergy(): void {
+    if (!this.hass?.connection) {
+      return;
+    }
+
+    const conn = this.hass.connection;
+    const isCollection = (obj: any) => obj && typeof obj.subscribe === 'function';
+    let collection: any = null;
+
+    const panelKey = `_energy_${this.hass.panelUrl}`;
+    if (isCollection(conn[panelKey])) {
+      collection = conn[panelKey];
+    } else if (isCollection(conn._energy)) {
+      collection = conn._energy;
+    } else {
+      for (const key of Object.keys(conn)) {
+        if (key.startsWith('_energy') && isCollection(conn[key])) {
+          collection = conn[key];
+          break;
+        }
+      }
+    }
+
+    if (collection && collection !== this._energyCollection) {
+      if (this._unsubEnergy) {
+        this._unsubEnergy();
+      }
+      this._energyCollection = collection;
+      this._unsubEnergy = collection.subscribe((data: any) => {
+        void this._fetchStatistics(data);
+      });
+    }
+  }
+
+  private async _fetchStatistics(energyData: any): Promise<void> {
+    if (!energyData?.start || !this.hass?.callWS) {
+      return;
+    }
+
+    const start = energyData.start as Date;
+    const end = (energyData.end as Date) || new Date();
+
+    let days = 1;
+    if (start && end) {
+      const diffTime = Math.abs(end.valueOf() - start.valueOf());
+      days = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    }
+    this._energyDays = days;
+
+    const today = new Date();
+    const startIsToday = start.getDate() === today.getDate()
+      && start.getMonth() === today.getMonth()
+      && start.getFullYear() === today.getFullYear();
+
+    if (startIsToday && days <= 1) {
+      this._energyStats = {};
+      this.requestUpdate();
+      return;
+    }
+
+    const statisticIds = Array.from(this.panels.values())
+      .map((p) => p.config.entity_energy)
+      .filter((id): id is string => !!id);
+
+    if (statisticIds.length === 0) {
+      return;
+    }
+
+    try {
+      const stats = await this.hass.callWS<Record<string, Array<{ change?: number }>>>({
+        type: 'recorder/statistics_during_period',
+        start_time: start.toISOString(),
+        end_time: end.toISOString(),
+        statistic_ids: statisticIds,
+        period: 'hour',
+        types: ['change'],
+      });
+
+      const newStats: Record<string, number> = {};
+      for (const id of statisticIds) {
+        const rows = stats?.[id];
+        if (rows && Array.isArray(rows)) {
+          newStats[id] = rows.reduce((sum, val) => sum + (val.change || 0), 0);
+        }
+      }
+
+      this._energyStats = newStats;
+      this.requestUpdate();
+    } catch (err) {
+      console.warn('[SolarPanelGridCard] Failed to fetch recorder statistics', err);
+    }
+  }
+
   update(changedProperties: Map<string | number | symbol, unknown>) {
     super.update(changedProperties);
 
     if (changedProperties.has('config')) {
+      const previousConfig = changedProperties.get('config') as SolarPanelGridCardConfig | undefined;
+      const persistChanged = previousConfig?.persist_view_state !== this.config?.persist_view_state;
+      if (persistChanged) {
+        if (this.config?.persist_view_state === false) {
+          this._showEnergy = false;
+          this._clearViewState();
+        } else {
+          this._showEnergy = this._loadViewState();
+        }
+      }
+
       // rebuild panels map whenever config changes
       this.panels.clear();
       if (this.config?.panels) {
@@ -293,9 +422,15 @@ export class SolarPanelGridCard extends LitElement {
           });
         });
       }
+
+      this._trySubscribeEnergy();
     }
 
     if (changedProperties.has('hass') && this.hass) {
+      if (!this._energyCollection) {
+        this._trySubscribeEnergy();
+      }
+
       // Update just the entity references when hass updates
       this.panels.forEach((panel, entity) => {
         panel.entity = this.hass.states[entity];
@@ -325,6 +460,11 @@ export class SolarPanelGridCard extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    if (this._unsubEnergy) {
+      this._unsubEnergy();
+      this._unsubEnergy = null;
+    }
+    this._energyCollection = null;
     if (this._resizeObserver) {
       this._resizeObserver.disconnect();
     }
@@ -361,6 +501,19 @@ export class SolarPanelGridCard extends LitElement {
   private _isTodaySelected(): boolean {
     if (!this._selectedDate) return false;
     return this._selectedDate === this._toDateInputValue(new Date());
+  }
+
+  private _isLiveSnapshotSelected(): boolean {
+    if (!this._isTodaySelected()) {
+      return false;
+    }
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    return Math.abs(this._selectedMinute - nowMinutes) <= 1;
+  }
+
+  private _isEnergyDateSelectionActive(): boolean {
+    return this._isLiveSnapshotSelected() && !!this._energyCollection;
   }
 
   private _getSelectedDateTime(): Date {
@@ -520,15 +673,33 @@ export class SolarPanelGridCard extends LitElement {
   private getProductionValue(entity: HassEntity | undefined): number {
     if (!entity) return 0;
 
+    if (this._isLiveSnapshotSelected() && this._energyStats[entity.entity_id] !== undefined) {
+      return this._energyStats[entity.entity_id];
+    }
+
     const value = parseFloat(entity.state);
     return isNaN(value) ? 0 : value;
+  }
+
+  private getDecimalsForEntity(entity: HassEntity | undefined): number {
+    const unit = entity?.attributes?.unit_of_measurement || '';
+    const raw = (unit === 'kWh' || unit === 'Wh')
+      ? this.config.energy_decimals
+      : this.config.power_decimals;
+    const defaultValue = (unit === 'kWh' || unit === 'Wh') ? 2 : 0;
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) {
+      return defaultValue;
+    }
+    return Math.max(0, Math.min(6, Math.round(parsed)));
   }
 
   private getMaxValue(panelConfig: SolarPanelConfig, unit: string): number {
     if (unit === 'kWh' || unit === 'Wh') {
       const maxDaily = panelConfig.max_daily_production || 5.5;
+      const periodMax = this._isLiveSnapshotSelected() ? maxDaily * (this._energyDays || 1) : maxDaily;
       // If unit is Wh, convert max_daily_production from kWh to Wh
-      return unit === 'Wh' ? maxDaily * 1000 : maxDaily;
+      return unit === 'Wh' ? periodMax * 1000 : periodMax;
     }
     return panelConfig.max_production || 400;
   }
@@ -647,6 +818,11 @@ export class SolarPanelGridCard extends LitElement {
       return;
     }
     if (event.pointerType === 'mouse' && event.button !== 0) {
+      return;
+    }
+
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('.solar-panel')) {
       return;
     }
 
@@ -1124,8 +1300,11 @@ export class SolarPanelGridCard extends LitElement {
   private _renderHistoryMeta(selectedDateTimeLabel: string) {
     const statusMarkup = this._historyLoading ? htmlFromTpl(cardHistoryStatusTpl) : '';
     const errorMarkup = this._historyError ? htmlFromTpl(cardHistoryErrorTpl, this._historyError) : '';
+    const energySyncMarkup = this._isEnergyDateSelectionActive()
+      ? htmlFromTpl('<span class="history-energy-sync">Synced with Energy date filter</span>')
+      : '';
 
-    return htmlFromTpl(cardHistoryMetaTpl, selectedDateTimeLabel, statusMarkup, errorMarkup);
+    return htmlFromTpl(cardHistoryMetaTpl, selectedDateTimeLabel, statusMarkup, energySyncMarkup, errorMarkup);
   }
 
   private _renderPanel(entityId: string, panel: { config: SolarPanelConfig; entity?: HassEntity; entityEnergy?: HassEntity }, canvasRotation: number) {
@@ -1134,10 +1313,14 @@ export class SolarPanelGridCard extends LitElement {
     const activeEntityId = (this._showEnergy && panel.config.entity_energy)
       ? panel.config.entity_energy
       : entityId;
+    const secondaryEntityId = (this._showEnergy && panel.config.entity_energy)
+      ? entityId
+      : panel.config.entity_energy;
     const activeEntity = this._getDisplayEntity(activeEntityId);
+    const secondaryEntity = secondaryEntityId ? this._getDisplayEntity(secondaryEntityId) : undefined;
+    const showSecondary = this.config.show_secondary === true;
     const panelStyle = `left: ${panel.config.x}px; top: ${panel.config.y}px; width: ${this.panelWidth}px; height: ${this.panelHeight}px;${rotation ? ` transform: rotate(${rotation}deg);` : ''}`;
     const panelValueStyle = totalRotation ? `transform: rotate(${-totalRotation}deg)` : '';
-    const entitySuffixStyle = totalRotation ? `transform: rotate(${-totalRotation}deg)` : '';
     const backgroundColor = this.getProductionColor(
       this.getProductionValue(activeEntity),
       this.getMaxValue(
@@ -1145,13 +1328,30 @@ export class SolarPanelGridCard extends LitElement {
         activeEntity?.attributes.unit_of_measurement || 'W'
       )
     );
-    const panelValueMarkup = activeEntity
+    const primaryPanelValueMarkup = activeEntity
       ? htmlFromTpl(
           cardPanelValueTpl,
-          this.getProductionValue(activeEntity).toFixed(1),
-          activeEntity.attributes.unit_of_measurement || ''
+          this.getProductionValue(activeEntity).toLocaleString(this.hass?.locale?.language || undefined, {
+            minimumFractionDigits: this.getDecimalsForEntity(activeEntity),
+            maximumFractionDigits: this.getDecimalsForEntity(activeEntity),
+          }),
+          activeEntity.attributes.unit_of_measurement || '',
+          'primary'
         )
       : htmlFromTpl(cardPanelErrorTpl);
+    const secondaryPanelValueMarkup = showSecondary && secondaryEntity
+      ? htmlFromTpl(
+          cardPanelValueTpl,
+          this.getProductionValue(secondaryEntity).toLocaleString(this.hass?.locale?.language || undefined, {
+            minimumFractionDigits: this.getDecimalsForEntity(secondaryEntity),
+            maximumFractionDigits: this.getDecimalsForEntity(secondaryEntity),
+          }),
+          secondaryEntity.attributes.unit_of_measurement || '',
+          'secondary'
+        )
+      : '';
+    const panelDisplayName = this.config.show_name === false ? '' : this.getPanelDisplayName(entityId, panel.config);
+    const panelNameMarkup = panelDisplayName ? htmlFromTpl('<div class="panel-name">{{0}}</div>', panelDisplayName) : '';
 
     return htmlFromTpl(
       cardPanelTpl,
@@ -1161,9 +1361,8 @@ export class SolarPanelGridCard extends LitElement {
       backgroundColor,
       this.panelImage,
       panelValueStyle,
-      panelValueMarkup,
-      entitySuffixStyle,
-      this.getPanelDisplayName(entityId, panel.config)
+      panelNameMarkup,
+      [primaryPanelValueMarkup, secondaryPanelValueMarkup]
     );
   }
 
@@ -1204,7 +1403,10 @@ export class SolarPanelGridCard extends LitElement {
       combinedScale,
       rotationStyle,
       backgroundMarkup,
-      panelMarkup
+      panelMarkup,
+      this.config.font_size_primary ?? 14,
+      this.config.font_size_secondary ?? 12,
+      this.config.font_size_unit ?? 10
     );
   }
 
