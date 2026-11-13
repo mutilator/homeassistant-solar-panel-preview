@@ -4,7 +4,7 @@
   <div class="panel-overlay">
     <div class="panel-value" style={{5}}>
       {{6}}
+      {{7}}
     </div>
-    <div class="entity-id-suffix" style={{7}}>{{8}}</div>
   </div>
 </div>

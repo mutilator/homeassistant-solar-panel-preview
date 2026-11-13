@@ -9,6 +9,9 @@ A custom Home Assistant Lovelace card for displaying solar panels in an interact
 - **Snap-to-Grid**: Panels snap to a configurable grid for neat alignment
 - **Live Data**: Real-time display of current production values from sensor entities
 - **Power / Energy Toggle**: Switch between instantaneous power (W) and daily energy (kWh) views with a slide toggle — configure a secondary energy entity per panel
+- **Dual Value Display**: Optional `show_secondary` setting shows both units per panel (primary + secondary) at the same time
+- **Text Size Controls**: Configure primary value, secondary value, and unit font sizes for tighter layouts
+- **Optional Name Badge**: Hide the panel name/entity suffix badge when space is limited
 - **Historical Playback**: Select any date and time (minute resolution) to view a 24-hour snapshot of all panel values, with a quick "Now" action to return to current time
 - **Per-Panel Rotation**: Rotate individual panels to match your physical roof layout
 - **Canvas Rotation**: Rotate the entire grid to orient the installation according to compass direction
@@ -108,7 +111,14 @@ canvas_width: 800          # Optional fixed canvas width (px)
 canvas_height: 600         # Optional fixed canvas height (px)
 background_image: /local/roof-plan.png   # Optional roof photo/plan
 background_opacity: 0.4   # Background image opacity (0–1)
-persist_view_state: false # Optional: remember W/kWh toggle in browser localStorage
+persist_view_state: true  # Optional: remember W/kWh toggle in browser localStorage
+show_secondary: false     # Optional: show both primary and secondary values on each panel
+show_name: true           # Optional: show/hide panel name badge (entity suffix/custom name)
+font_size_primary: 14     # Optional: primary value font size in px
+font_size_secondary: 12   # Optional: secondary value font size in px
+font_size_unit: 10        # Optional: unit font size in px
+power_decimals: 0         # Optional: decimal places for W values
+energy_decimals: 2        # Optional: decimal places for kWh/Wh values
 panels:
   - entity: sensor.solar_inverter_1
     entity_energy: sensor.solar_inverter_1_energy_today  # Optional energy entity
@@ -142,8 +152,15 @@ panels:
 | `canvas_height` | number | — | Fixed canvas height in pixels. When set (with `canvas_width`), overrides auto-sizing in both editor and dashboard |
 | `background_image` | string | — | URL to a background image (e.g. `/local/roof-plan.png`). Anchored at top-left at natural size (not stretched) |
 | `background_opacity` | number | 0.4 | Opacity of the background image (0–1) |
+| `persist_view_state` | boolean | true | Remembers the W/kWh toggle state in browser localStorage; set `false` to disable |
 | `panels` | array | Required | List of solar panel configurations |
-| `persist_view_state` | boolean | false | When `true`, remembers the W/kWh toggle state in browser localStorage |
+| `show_secondary` | boolean | false | When `true`, each panel also shows the non-active unit (W in kWh view, kWh in W view) |
+| `show_name` | boolean | true | When `false`, hides the panel name/entity suffix badge |
+| `font_size_primary` | number | 14 | Primary value font size in px |
+| `font_size_secondary` | number | 12 | Secondary value font size in px |
+| `font_size_unit` | number | 10 | Unit label font size in px |
+| `power_decimals` | number | 0 | Decimal places used for power values (`W`) |
+| `energy_decimals` | number | 2 | Decimal places used for energy values (`kWh` / `Wh`) |
 
 #### Panel-Level Options
 
@@ -168,6 +185,8 @@ Each panel displays:
 - **Production Value**: Current production displayed in center with unit of measurement
 - **Entity ID Suffix**: Last 4 characters of entity ID (or custom `name`) at bottom-right corner for quick identification
 - **W / kWh Toggle**: When energy entities are configured, a slide toggle in the top-right corner switches the entire card between power and energy views
+- **Dual Value Display**: When `show_secondary: true` and `entity_energy` is configured, each panel shows both units (primary and secondary)
+- **Panel Name Badge**: Shows custom panel `name` (or entity suffix) when `show_name` is enabled
 - **Date + Time Snapshot Controls**: A date picker and 24-hour slider at the top fetch history and render all panels at that selected timestamp
 
 ### Color Gradient

@@ -35,6 +35,13 @@ interface SolarPanelGridCardConfig {
   background_image?: string;
   background_opacity?: number;
   persist_view_state?: boolean;
+  show_secondary?: boolean;
+  show_name?: boolean;
+  font_size_primary?: number;
+  font_size_secondary?: number;
+  font_size_unit?: number;
+  power_decimals?: number;
+  energy_decimals?: number;
 }
 
 /**
@@ -60,7 +67,14 @@ export class SolarPanelGridCardEditor extends LitElement {
       grid_size: 10,
       panel_width: 80,
       panel_height: 144,
-      persist_view_state: false,
+      persist_view_state: true,
+      show_secondary: false,
+      show_name: true,
+      font_size_primary: 14,
+      font_size_secondary: 12,
+      font_size_unit: 10,
+      power_decimals: 0,
+      energy_decimals: 2,
     };
   }
 
@@ -248,6 +262,78 @@ export class SolarPanelGridCardEditor extends LitElement {
           boolean: {},
         },
       },
+      {
+        name: 'show_secondary',
+        required: false,
+        selector: {
+          boolean: {},
+        },
+      },
+      {
+        name: 'show_name',
+        required: false,
+        selector: {
+          boolean: {},
+        },
+      },
+      {
+        name: 'font_size_primary',
+        required: false,
+        selector: {
+          number: {
+            min: 8,
+            max: 48,
+            step: 1,
+            unit_of_measurement: 'px',
+          },
+        },
+      },
+      {
+        name: 'font_size_secondary',
+        required: false,
+        selector: {
+          number: {
+            min: 8,
+            max: 48,
+            step: 1,
+            unit_of_measurement: 'px',
+          },
+        },
+      },
+      {
+        name: 'font_size_unit',
+        required: false,
+        selector: {
+          number: {
+            min: 8,
+            max: 32,
+            step: 1,
+            unit_of_measurement: 'px',
+          },
+        },
+      },
+      {
+        name: 'power_decimals',
+        required: false,
+        selector: {
+          number: {
+            min: 0,
+            max: 6,
+            step: 1,
+          },
+        },
+      },
+      {
+        name: 'energy_decimals',
+        required: false,
+        selector: {
+          number: {
+            min: 0,
+            max: 6,
+            step: 1,
+          },
+        },
+      },
     ];
   }
 
@@ -264,6 +350,13 @@ export class SolarPanelGridCardEditor extends LitElement {
       canvas_height: 'Canvas Height (px)',
       canvas_rotation: 'Canvas Rotation (°)',
       persist_view_state: 'Remember W / kWh Toggle State',
+      show_secondary: 'Show Secondary Value (W + kWh)',
+      show_name: 'Show Panel Name Badge',
+      font_size_primary: 'Primary Value Font Size (px)',
+      font_size_secondary: 'Secondary Value Font Size (px)',
+      font_size_unit: 'Unit Font Size (px)',
+      power_decimals: 'Power Decimals (W)',
+      energy_decimals: 'Energy Decimals (kWh/Wh)',
     };
     return labels[schema.name] || schema.name;
   }
